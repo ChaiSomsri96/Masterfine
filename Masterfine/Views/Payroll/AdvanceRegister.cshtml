@@ -1,0 +1,911 @@
+﻿@using System.Data
+@{
+    ViewData["Title"] = "AdvanceRegister";
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Advance</h2>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Main", "Home")">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a>Payroll</a>
+            </li>
+            <li class="active breadcrumb-item">
+                <strong>Advance Register</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-down"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content" style="display:none;">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Advance Voucher No.</label>
+                                    <input type="text" id="advanceVoucherNo" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Employee Name</label>
+                                    <input type="text" placeholder="" id="employeeName" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>Voucher Type</label>
+                                    <select name="voucherType" class="form-control" id="voucherType">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <br />
+                                <br />
+                                <div class="form-group">
+                                    <label>Employee Code</label>
+                                    <input type="text" placeholder="" id="employeeCode" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Salary Month</label>
+                                    <input type="month" placeholder="" class="form-control" value="@ViewData["month"]" id="salaryMonth" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                          <button type="button" class="btn btn-info" id="btn_Search">Search</button>
+                          <button type="button" class="btn btn-info" id="btn_Clear">Clear</button>
+                    </div>
+                </div>
+            </div>
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">                                        
+                    <table class="table table-striped table-bordered table-hover dataTables-advanceReg">
+                        <thead>
+                            <tr>
+                                <th>Sl No</th>
+                                <th>Voucher Name</th>
+                                <th>Employee Code</th>
+                                <th>Employee</th>
+                                <th>Month</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>                            
+                        </tbody>
+                    </table>
+                    <div class="modal inmodal fade" id="advanceModal" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                    <h4 class="modal-title">Advance Payment</h4>
+                                    <small class="font-bold">Create advance</small>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Advance Voucher No.</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <input type="text" id="new_voucherNo" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Employee Name</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <select name="employeeName" id="new_employeeName" class="form-control" required>
+                                                    </select>
+                                                </div>
+                                                <a type="button" class="btn btn-info" href="@Url.Action("Employee")" target="_blank">+</a>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Salary Month</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <input type="month" id="new_salaryMonth" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Cheque No.</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <input type="text" id="new_chequeNo" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Date</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <input type="date" id="new_date" class="form-control" required>
+                                                </div>                                                    
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Amount</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <input type="number" id="new_amount" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Cash / Bank / a/c</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <select id="new_cashOrBank" class="form-control" required>
+                                                    </select>
+                                                </div>
+                                                <a type="button" class="btn btn-info" href="@Url.Action("Employee")" target="_blank">+</a>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Cheque Date</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <input type="date" id="new_chequeDate" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Narration</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <textarea name="narration" id="new_narration" class="form-control"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" id="new_save">Save</button>
+                                    <button type="button" class="btn btn-primary" id="new_clear">Clear</button>
+                                </div>                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal inmodal fade" id="advanceEdit" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                    <h4 class="modal-title">Edit or view Advance</h4>
+                                    <small class="font-bold">Edit view Advance</small>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Advance Voucher No.</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <input type="text" id="edit_voucherNo" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Employee Name</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <select name="employeeName" id="edit_employeeName" class="form-control">
+                                                    </select>
+                                                </div>
+                                                <a type="button" class="btn btn-info" href="@Url.Action("Employee")" target="_blank">+</a>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Salary Month</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <input type="month" id="edit_salaryMonth" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Cheque No.</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <input type="text" id="edit_chequeNo" class="form-control" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Date</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <input type="date" id="edit_date" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Amount</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <input type="number" id="edit_amount" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Cash / Bank / a/c</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <select name="employeeName" id="edit_cashOrBank" class="form-control">
+                                                    </select>
+                                                </div>
+                                                <a type="button" class="btn btn-info" href="" target="_blank">+</a>    
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Cheque Date</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <input type="date" id="edit_chequeDate" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-lg-12">
+                                                    <label>Narration</label>
+                                                </div>
+                                                <div class="col-lg-10">
+                                                    <textarea id="edit_narration" class="form-control" required>
+                                                    </textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" id="edit_update">Update</button>
+                                    <button type="button" class="btn btn-primary" id="edit_clear">Clear</button>
+                                    <button type="button" class="btn btn-danger" id="edit_delete">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link rel="stylesheet" href="~/lib/dataTables/datatables.min.css" />
+        <link rel="stylesheet" href="~/lib/sweetalert/dist/sweetalert.css" />
+    </environment>
+}
+
+@section Scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/lib/dataTables/datatables.min.js"></script>
+        <script src="~/lib/dataTables/dataTables.bootstrap4.min.js"></script>
+        <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
+        <script src="~/js/common.js"></script>
+    </environment>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var oTable = $('.dataTables-advanceReg').dataTable({
+                pageLength: 100,
+                dom: '<"html5buttons"B>lTfgitp',
+                buttons: [
+                    {
+                        text: 'Advance Payment',
+                        action: function (e, dt, node, config) {
+                            initAdvancePaymentModal();
+                            $('#advanceModal').modal('show');
+                        }
+                    }
+                ],
+                "columnDefs": [
+                    /*
+                     * full[0]-SL.NO
+                     * full[1]-employeeId
+                     * full[2]-voucherNo
+                     * full[3]-voucherTypeName
+                     * full[4]-employeeCode
+                     * full[5]-employeeName
+                     * full[6]-month
+                     * full[7]-amount
+                     * full[8]-advancePaymentId
+                     * full[9]-financialYearId
+                     */
+                    {
+                        targets: [0],
+                        render: function (o, v) {
+                            return o;
+                        },
+                    },
+                    {
+                        targets: [1],
+                        render: function (data, type, full) {
+                            var voucherTypeName = full[3];
+                            return voucherTypeName;
+                        },
+                    },
+                    {
+                        targets: [2],
+                        render: function (data, type, full) {
+                            var employeeCode = full[4];
+                            return employeeCode;
+                        },
+                    },
+                    {
+                        targets: [3],
+                        render: function (data, type, full) {
+                            var employeeName = full[5];
+                            return employeeName;
+                        },
+                    },
+                    {
+                        targets: [4],
+                        render: function (data, type, full) {
+                            var month = full[6];
+                            return month;
+                        },
+                    },
+                    {
+                        targets: [5],
+                        render: function (data, type, full) {
+                            var amount = full[7];
+                            return amount;
+                        },
+                    }
+                ],
+            });
+            var thisMonth = $('#salaryMonth').val();
+            var today = "";
+            var thisVoucherNo = "";
+            onTableLoad();
+            function onTableLoad() {                
+                refreshTable("", "", "", thisMonth, "All");
+            }
+
+            function VoucherTypeNameComboFill(comboData) {
+                $('#voucherType option').remove();
+                var tbObj = JSON.parse(comboData);
+                var string = "";
+                for (var i = 0; i < tbObj.length; i++) {
+                    string = string + "<option value='" + tbObj[i]['voucherTypeId'] + "'>" + tbObj[i]['voucherTypeName'] + "</option>";
+                }
+                $('#voucherType').append(string);
+            }
+
+            function refreshTable(voucherNo, employeeCode, employeeName, salaryMonth, voucherType) {
+                oTable.fnClearTable();
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetAttendanceReigsterDetails")",
+                    data: {
+                        voucherNo: voucherNo,
+                        employeeCode: employeeCode,
+                        employeeName: employeeName,
+                        salaryMonth: salaryMonth,
+                        voucherType: voucherType
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        if (response["success"] == "false") {
+                            swal("Failed", "Not found", "warning");
+                        }
+                        else {
+                            if (response['ex'] == "no") {
+                                VoucherTypeNameComboFill(response["comboData"]);
+                                var tbObj = JSON.parse(response["tableData"]);
+                                
+                                for (var i = 0; i < tbObj.length; i++) {
+                                    var tbArray = ConvertObjectToArray(tbObj[i]);
+                                    oTable.fnAddData(tbArray);
+                                }
+                                trigger_advanceRegister_row_click();
+                            } else {
+                                alert(response['ex']);
+                            }
+                        }
+                    },
+                    error: function (req, status, error) {
+                        swal("Failed", "API Server Connection Error", "warning");
+                    }
+                });
+            }
+
+            $("#btn_Search").on('click', function () {
+                refreshTableByValues();
+            });
+
+            function refreshTableByValues() {
+                var voucherNo = $("#advanceVoucherNo").val();
+                var employeeName = $("#employeeName").val();
+                var voucherTypeVal = $("#voucherType").val();
+                var voucherType = $("#voucherType option[value='" + voucherTypeVal + "']").text();
+                var employeeCode = $("#employeeCode").val();
+                var salaryMonth = $("#salaryMonth").val();
+                refreshTable(voucherNo, employeeCode, employeeName, salaryMonth, voucherType);
+            }
+
+            $("#btn_Clear").on('click', function () {
+                $("#advanceVoucherNo").val("");
+                $("#employeeName").val("");
+                $("#voucherType").val("0");
+                $("#employeeCode").val("");
+                $("#salaryMonth").val(thisMonth);
+                onTableLoad();
+            });
+
+            // ----------------------------------------------------------//
+            //---------------------   Create Modal  ---------------------//
+            //-----------------------------------------------------------//
+            function initAdvancePaymentModal() {
+                var form = $('#__AjaxAntiForgeryForm');
+                var token = $('input[name="__RequestVerificationToken"]', form).val();
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetAdvancePaymentDetails")",
+                    data: {
+                        __RequestVerificationToken: token,
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        if (response["success"] == "true") {
+                            if (response["ex"] == "no") {
+                                refreshAdvancePaymentModal(response);
+                            }
+                            else {
+                                alert(response["ex"]);
+                            }
+                        } else {
+                            swal("Failed", "Not found", "warning");
+                        }
+                    },
+                    error: function (req, status, error) {
+                        swal("Failed", "Connection Error", "warning");
+                    }
+                });
+            }
+
+            function refreshAdvancePaymentModal(response) {
+                var date = response["date"];
+                today = date;
+                var employee = response["employee"];
+                var cashOrBank = response["cashOrBank"];
+                var voucherNo = response["voucherNo"];
+                thisVoucherNo = voucherNo;
+
+                Clear("new");
+                CheckBankOrCash("new", false);
+
+                $('#new_employeeName option').remove();
+                var employeeObj = JSON.parse(employee);
+                var string = "";
+                for (var i = 0; i < employeeObj.length; i++) {
+                    string = string + "<option value='" + employeeObj[i]['employeeId'] + "'>" + employeeObj[i]['employeeName'] + "</option>";
+                }
+                $('#new_employeeName').append(string);
+
+                $('#new_cashOrBank option').remove();
+                var cashOrBankObj = JSON.parse(cashOrBank);
+                string = "";
+                for (var i = 0; i < cashOrBankObj.length; i++) {
+                    string = string + "<option value='" + cashOrBankObj[i]['ledgerId'] + "'>" + cashOrBankObj[i]['ledgerName'] + "</option>";
+                }
+                $('#new_cashOrBank').append(string);
+
+                $('#new_employeeName').val(-1);
+                $('#new_cashOrBank').val(-1);
+            }
+
+            $('#new_cashOrBank').on('change', function () {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("CheckBankOrCash")",
+                    data: {},
+                    dataType: "json",
+                    success: function (response) {
+                        if (response["success"] == "true") {
+                            if (response["ex"] == "no") {
+                                var isBankAccount = response["isBankAccount"];
+                                CheckBankOrCash("new", isBankAccount);
+                            }
+                            else {
+                                alert(response["ex"]);
+                            }
+                        } else {
+                            swal("Failed", "Not found", "warning");
+                        }
+                    },
+                    error: function (req, status, error) {
+                        swal("Failed", "Connection Error", "warning");
+                    }
+                }); 
+            });
+
+            function CheckBankOrCash(type, flag) {
+                if (flag == true) {
+                    $("#" + type +"_chequeDate").attr('disabled', true);
+                    $("#" + type +"_chequeNo").attr('disabled', true);
+                    $("#" + type +"_chequeNo").val("");
+                }
+                else {
+                    $("#" + type +"_chequeDate").attr('disabled', false);
+                    $("#" + type +"_chequeNo").attr('disabled', false);
+                }
+            }
+
+            $("#new_save").on('click', function () {
+                var voucherNo = $("#new_voucherNo").val();
+                var employeeId = $("#new_employeeName").val();
+                var salaryMonth = $("#new_salaryMonth").val();
+                var chequeNo = $("#new_chequeNo").val();
+                var date = $("#new_date").val();
+                var amount = $("#new_amount").val();
+                var ledgerId = $("#new_cashOrBank").val();
+                var chequeDate = $("#new_chequeDate").val();
+                var narration = $("#new_narration").val();
+
+                if (checkInputValue("new", voucherNo, date, employeeId, amount, ledgerId))
+                {
+                    swal({
+                        title: "Are you sure?",
+                        text: "You will be able to save these data",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes, save it!",
+                        closeOnConfirm: false
+                    }, function () {
+                        var form = $('#__AjaxAntiForgeryForm');
+                        var token = $('input[name="__RequestVerificationToken"]', form).val();
+                        $.ajax({
+                            type: "POST",
+                            url: "@Url.Action("SaveAdvancePaymentFunction")",
+                            data: {
+                                __RequestVerificationToken: token,
+                                voucherNo: voucherNo,
+                                employeeId: employeeId,
+                                salaryMonth: salaryMonth,
+                                chequeNo: chequeNo,
+                                date: date,
+                                amount: amount,
+                                ledgerId: ledgerId,
+                                chequeDate: chequeDate,
+                                narration: narration
+                            },
+                            dataType: "json",
+                            success: function (response) {
+                                if (response["success"] == "false") {
+                                    swal("Failed", "Database Connection Error", "warning");
+                                }
+                                else {
+                                    if (response["ex"] == "no") {
+                                        if (response["message"] != "" && response["newVoucherNo"] == "") {
+                                            $("#" + response["focus"]).focus();
+                                            swal("Warning", response["message"], "warning");
+                                        }
+                                        else {
+                                            Clear("new");
+                                            refreshTableByValues();
+                                            swal("Save!", "Advance Payment data has been saved.", "success");
+                                            $('#advanceModal').modal('hide');
+                                            if (response["newVoucherNo"] != "") {
+                                                swal("Warning", response["message"], "warning");
+                                                $("#new_voucherNo").val(response["newVoucherNo"]);
+                                            }
+                                                
+                                        }
+                                    }
+                                    else
+                                        alert(response["ex"]);
+                                }
+                            },
+                            error: function (req, status, error) {
+                                swal("Failed", "Connection Error", "warning");
+                            }
+                        });
+                    });
+                }
+            });
+
+            $("#new_clear").on('click', function () {
+                Clear("new");
+            });
+
+            function Clear(type) {
+                $("#" + type +"_voucherNo").val(thisVoucherNo);
+                $("#" + type +"_voucherNo").attr('disabled', true);
+                $("#" + type +"_salaryMonth").val(thisMonth);
+                $("#" + type +"_date").val(today);
+                $("#" + type +"_chequeDate").val(today);
+                $("#" + type +"_employeeName").val(-1);
+                $("#" + type +"_cashOrBank").val(-1);
+                $("#" + type +"_narration").val("");
+                $("#" + type +"_amount").val("");
+                $("#" + type +"_chequeNo").val("");
+                $("#" + type +"_chequeNo").attr('disabled', false);
+            }
+
+            function checkInputValue(type, voucherNo, date, employeeId, amount, ledgerId) {
+                if (voucherNo == "") {
+                    $("#" + type + "_voucherNo").focus();
+                    swal("Warning", "Enter advance voucher no", "warning");
+                }
+                else if (date == "") {
+                    swal("Warning", "Select date", "warning");
+                }
+                else if (employeeId == null) {
+                    $("#" + type + "_employeeName").focus();
+                    swal("Warning", "Select employee", "warning");
+                }
+                else if (amount == "") {
+                    $("#" + type + "_amount").focus();
+                    swal("Warning", "Select amount", "warning");
+
+                }
+                else if (ledgerId == null) {
+                    $("#" + type + "_cashOrBank").focus();
+                    swal("Warning", "Select Cash/Bank/ac", "warning");
+                }
+                else
+                    return true;
+                return false;
+            }
+
+            // ----------------------------------------------------------//
+            //---------------------    Edit Modal   ---------------------//
+            //-----------------------------------------------------------//
+            var selAdvancePaymentEditId = -1;
+            function trigger_advanceRegister_row_click() {
+                 $(".dataTables-advanceReg tbody tr").on("click", null, function () {
+                     var trPos = oTable.fnGetPosition(this);
+                     var aData = oTable.fnGetData(trPos);
+                     var advancePaymentId = aData[8];
+                     selAdvancePaymentEditId = advancePaymentId;
+
+                     var form = $('#__AjaxAntiForgeryForm');
+                     var token = $('input[name="__RequestVerificationToken"]', form).val();
+                     $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("GetAdvancePaymentEditDetails")",
+                        data: {
+                            __RequestVerificationToken: token,
+                            advancePaymentEditId : advancePaymentId
+                        },
+                        dataType: "json",
+                        success: function (response) {
+                            if (response["success"] == "true") {
+                                if (response["ex"] == "no") {
+                                    refreshAdvanceEditModal(response["data"]);
+                                }
+                                else {
+                                    alert(response["ex"]);
+                                }
+                            } else {
+                                swal("Failed", "Not found", "warning");
+                            }
+                        },
+                        error: function (req, status, error) {
+                            swal("Failed", "Connection Error", "warning");
+                        }
+                     });
+                     $('#advanceEdit').modal('show');
+                });
+            }
+
+            function refreshAdvanceEditModal(response) {
+                var voucherNo = response["voucherNo"];
+                var employee = response["employee"];
+                var employeeId = response["employeeId"];
+                var salaryMonth = response["salaryMonth"];
+                var chequeNo = response["chequeNo"];
+                var date = response["date"];
+                var amount = response["amount"];
+                var cashOrBank = response["cashOrBank"];
+                var ledgerId = response["ledgerId"];
+                var chequeDate = response["chequeDate"];
+                var narration = response["narration"];
+                var isAutomatic = response["isAutomatic"];
+                CheckBankOrCash("edit", response["isBankAccount"]);
+
+                $("#edit_voucherNo").val(voucherNo);                
+                $("#edit_salaryMonth").val(salaryMonth);
+                $("#edit_date").val(date);
+                $("#edit_chequeDate").val(chequeDate);
+                $("#edit_chequeNo").val(chequeNo);
+                $("#edit_amount").val(amount);
+                $("#edit_narration").val(narration);
+
+                if (isAutomatic)
+                    $("#edit_voucherNo").attr('disabled', true);
+                else
+                    $("#edit_voucherNo").attr('disabled', false);
+
+                $('#edit_employeeName option').remove();
+                var employeeObj = JSON.parse(employee);
+                var string = "";
+                for (var i = 0; i < employeeObj.length; i++) {
+                    string = string + "<option value='" + employeeObj[i]['employeeId'] + "'";
+                    string = string + ">" + employeeObj[i]['employeeName'] + "</option>";
+                }
+                $('#edit_employeeName').append(string);
+                $('#edit_employeeName').val(employeeId);
+
+                $('#edit_cashOrBank option').remove();
+                var cashOrBankObj = JSON.parse(cashOrBank);
+                string = "";
+                for (var i = 0; i < cashOrBankObj.length; i++) {
+                    string = string + "<option value='" + cashOrBankObj[i]['ledgerId'] + "'";
+                    string = string + ">" + cashOrBankObj[i]['ledgerName'] + "</option>";
+                }
+                $('#edit_cashOrBank').append(string);
+                $('#edit_cashOrBank').val(ledgerId);
+            }
+
+            $("#edit_update").on('click', function () {
+                var voucherNo = $("#edit_voucherNo").val();
+                var employeeId = $("#edit_employeeName").val();
+                var salaryMonth = $("#edit_salaryMonth").val();
+                var chequeNo = $("#edit_chequeNo").val();
+                var date = $("#edit_date").val();
+                var amount = $("#edit_amount").val();
+                var ledgerId = $("#edit_cashOrBank").val();
+                var chequeDate = $("#edit_chequeDate").val();
+                var narration = $("#edit_narration").val();
+
+                if (checkInputValue("edit", voucherNo, date, employeeId, amount, ledgerId))
+                {
+                    swal({
+                        title: "Are you sure?",
+                        text: "You will be able to update these data",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes, update it!",
+                        closeOnConfirm: false
+                    }, function () {
+                        var form = $('#__AjaxAntiForgeryForm');
+                        var token = $('input[name="__RequestVerificationToken"]', form).val();
+                        $.ajax({
+                            type: "POST",
+                            url: "@Url.Action("EditAdvancePaymentFunction")",
+                            data: {
+                                __RequestVerificationToken: token,
+                                voucherNo: voucherNo,
+                                employeeId: employeeId,
+                                salaryMonth: salaryMonth,
+                                chequeNo: chequeNo,
+                                date: date,
+                                amount: amount,
+                                ledgerId: ledgerId,
+                                chequeDate: chequeDate,
+                                narration: narration,
+                                advancePaymentEditId: selAdvancePaymentEditId
+                            },
+                            dataType: "json",
+                            success: function (response) {
+                                if (response["success"] == "false") {
+                                    swal("Failed", "Database Connection Error", "warning");
+                                }
+                                else {
+                                    if (response["ex"] == "no") {
+                                        if (response["message"] != "") {
+                                            $("#" + response["focus"]).focus();
+                                            swal("Warning", response["message"], "warning");
+                                        }
+                                        else {
+                                            refreshTableByValues();
+                                            swal("Update!", "Advance Payment data has been updated.", "success");
+                                            $('#advanceEdit').modal('hide');
+                                            $("#edit_voucherNo").focus();
+                                        }
+                                    }
+                                    else
+                                        alert(response["ex"]);
+                                }
+                            },
+                            error: function (req, status, error) {
+                                swal("Failed", "Connection Error", "warning");
+                            }
+                        });
+                    });
+                }
+            });
+
+             $("#edit_delete").on("click", null, function () {
+                 var voucherNo = $("#edit_voucherNo").val();
+                 var employeeId = $("#edit_employeeName").val();
+                 var salaryMonth = $("#edit_salaryMonth").val();
+
+                 swal({
+                    title: "Are you sure?",
+                    text: "You will not be able to recover these data!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, delete it!",
+                    closeOnConfirm: false
+                }, function () {
+                    var form = $('#__AjaxAntiForgeryForm');
+                    var token = $('input[name="__RequestVerificationToken"]', form).val();
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("DeleteAdvancePaymentFunction")",
+                        data: {
+                            __RequestVerificationToken: token,
+                            voucherNo: voucherNo,
+                            employeeId: employeeId,
+                            salaryMonth: salaryMonth
+                        },
+                        dataType: "json",
+                        success: function (response) {
+                            if (response["success"] == "false") {
+                                alert(response["ex"]);
+                            }
+                            else {
+                                if (response["message"] == "") {
+                                    refreshTableByValues();
+                                    swal("Delete!", "Deleted successfully", "success");
+                                }
+                                else {
+                                    swal("Warning", response["message"], "warning");
+                                    $("#edit_salaryMonth").focus();
+                                }
+                                    
+                            }
+                        },
+                        error: function (req, status, error) {
+                            swal("Failed", "API Server Connection Error", "warning");
+                        }
+                    });
+                });
+            })
+
+            $("#edit_clear").on('click', function () {
+                Clear("edit");
+            });
+        });
+    </script>
+}

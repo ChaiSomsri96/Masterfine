@@ -1,0 +1,519 @@
+﻿@using System.Data
+@{
+    ViewData["Title"] = "BonusOrDeduction";
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Bonus Deduction</h2>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Main", "Home")">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a>Payroll</a>
+            </li>
+            <li class="active breadcrumb-item">
+                <strong>Bonus or Deduction Register</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-down"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content" style="display:none;">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group container-fluid">
+                                    <label>Employee Name</label>
+                                    <select class="form-control" id="employee_name"></select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group container-fluid">
+                                    <label>Month</label>
+                                    <input type="month" value="@ViewData["month"]" class="form-control" id="monthpicker">
+                                </div>
+                            </div>
+                        </div>
+                    </div>                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info" id="btn_Search">Search</button>
+                        <button type="button" class="btn btn-info" id="btn_Clear">Clear</button>
+                    </div>
+                </div>
+            </div>
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">                    
+                    <table class="table table-striped table-bordered table-hover dataTables-bonusDeductionReg">
+                        <thead>
+                            <tr>
+                                <th>Sl No</th>
+                                <th>Employee Code</th>
+                                <th>Employee Name</th>
+                                <th>Month</th>
+                                <th>Bonus</th>
+                                <th>Deduction</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <div class="modal inmodal fade" id="bonusDeductionModal" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-bonusDeduction">
+                            <div class="modal-content modal-content-bonusDeduction">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                    <h4 class="modal-title">Bonus / Deduction</h4>
+                                    <small class="font-bold" id="sub_title">Create Bonus or Deduction</small>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Date</label>
+                                                <input type="date" id="bonus_date" class="form-control" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Month</label>
+                                                <input type="month" id="bonus_month" class="form-control" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Deduction Amount</label>
+                                                <input type="number" id="deduction_amount" class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Employee Code</label>
+                                                <select name="employeeCode" id="bonus_employeeCode" class="form-control">
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Bonus Amount</label>
+                                                <input type="number" id="bonus_amount" class="form-control" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Narration</label>
+                                                <textarea id="bonus_narration" class="form-control" required></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary" id="bonus_save">Save</button>
+                                    <button type="button" class="btn btn-primary" id="bonus_clear">Clear</button>
+                                    <button type="button" class="btn btn-danger" id="bonus_delete">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link rel="stylesheet" href="~/lib/dataTables/datatables.min.css" />
+        <link rel="stylesheet" href="~/lib/sweetalert/dist/sweetalert.css" />
+    </environment>
+}
+
+@section Scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/lib/dataTables/datatables.min.js"></script>
+        <script src="~/lib/dataTables/dataTables.bootstrap4.min.js"></script>
+        <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
+        <script src="~/js/common.js"></script>
+    </environment>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var tr = null;
+            var oTable = $('.dataTables-bonusDeductionReg').dataTable({
+                pageLength: 100,
+                dom: '<"html5buttons"B>lTfgitp',
+                buttons: [
+                    {
+                        text: 'Bonus / Deduction',
+                        action: function (e, dt, node, config) {
+                            initBonusDeductionModal();
+                            $('#bonusDeductionModal').modal('show');
+                        }
+                    }
+                ],
+                "columnDefs": [
+                    /*
+                     * full[0]-SL.NO
+                     * full[1]-employeeCode
+                     * full[2]-employeeName
+                     * full[3]-month
+                     * full[4]-bonus
+                     * full[5]-deduction
+                     * full[6]-deductionId
+                     */
+                    {
+                        targets: [0],
+                        render: function (o, v) {
+                            return o;
+                        },
+                    },
+                    {
+                        targets: [1],
+                        render: function (o, v) {
+                            return o;
+                        },
+                    },
+                    {
+                        targets: [2],
+                        render: function (o, v) {
+                            return o;
+                        },
+                    },
+                    {
+                        targets: [3],
+                        render: function (o, v) {
+                            return o;
+                        },
+                    },
+                    {
+                        targets: [4],
+                        render: function (o, v) {
+                            return o;
+                        },
+                    },
+                    {
+                        targets: [5],
+                        render: function (o, v) {
+                            return o;
+                        },
+                    }
+                ],
+            });
+
+            var bonusDeductionId = 0;
+            var thisMonth = $("#monthpicker").val();
+            initTable();
+
+            $("#btn_Search").on('click', function () {
+                searchTable();
+            });
+
+            $("#btn_Clear").on('click', function () {
+                $("#employee_name").val(0);
+                $("#monthpicker").val(thisMonth);
+                searchTable();
+            });
+
+            $("#bonus_clear").on('click', function () {
+                initBonusDeductionModal();
+            });
+
+            $("#bonus_save").on('click', function () {
+                var btnStatus = $("#bonus_save").text();
+                var employeeId = $('#bonus_employeeCode').val();;
+                var date = $("#bonus_date").val();
+                var month = $("#bonus_month").val();
+                var bonusAmount = $("#bonus_amount").val();
+                var deductionAmount = $("#deduction_amount").val();
+                var narration = $("#bonus_narration").val();
+                var bonusId = "";
+                if (btnStatus == "Update")
+                    bonusId = bonusDeductionId;
+                onSaveOrEditBonusDeduction(btnStatus, employeeId, date, month,
+                    bonusAmount, deductionAmount, narration, bonusId);
+            });
+
+            $("#bonus_delete").on("click", null, function () {
+                var employeeId = $('#bonus_employeeCode').val();
+                var month = $("#bonus_month").val();
+                swal({
+                    title: "Are you sure?",
+                    text: "You will not be able to recover these data!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, delete it!",
+                    closeOnConfirm: false
+                }, function () {
+                    var form = $('#__AjaxAntiForgeryForm');
+                    var token = $('input[name="__RequestVerificationToken"]', form).val();
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("DeleteBonusDeduction")",
+                        data: {
+                            __RequestVerificationToken: token,
+                            employeeId: employeeId,
+                            month: month
+                        },
+                        dataType: "json",
+                        success: function (response) {
+                            if (response["success"] == "false") {
+                                alert(response["ex"]);
+                            }
+                            else {
+                                if (response["message"] == "") {
+                                    initTable();
+                                    swal("Delete!", "Deleted successfully", "success");
+                                    $('#bonusDeductionModal').modal('hide');
+                                }
+                                else {
+                                    swal("Warning", response["message"], "warning");
+                                }
+                                    
+                            }
+                        },
+                        error: function (req, status, error) {
+                            swal("Failed", "API Server Connection Error", "warning");
+                        }
+                    });
+                });
+            })
+
+            function initTable() {
+                var month = $("#monthpicker").val();
+                refreshTable("All", month, true);
+            }
+
+            function searchTable(){
+                var month = $("#monthpicker").val();
+                var employeeId = $("#employee_name").val();
+                var employeeName;
+                if (employeeId == null || employeeId == "0")
+                    employeeName = "All";
+                else
+                    employeeName = $("#employee_name option[value='" + employeeId + "']").text();
+                refreshTable(employeeName, month, false);
+            }
+
+            function refreshTable(employeeName, month, comboRedraw) {
+                oTable.fnClearTable();
+                var form = $('#__AjaxAntiForgeryForm');
+                var token = $('input[name="__RequestVerificationToken"]', form).val();
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetBonusDeductionRegister")",
+                    data: {
+                        __RequestVerificationToken: token,
+                        employeeName: employeeName,
+                        month: month
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        if (response["success"] == "true") {
+                            var tbObj = JSON.parse(response["tableData"]);
+                            var employeeObj = JSON.parse(response["comboData"]);
+                            
+                            if (comboRedraw){
+                                $('#employee_name option').remove();
+                                var string = "<option value='0'>All</option>";
+                                for (var i = 0; i < employeeObj.length; i++) {
+                                    string = string + "<option value='" + employeeObj[i]['employeeId'] + "'";
+                                    string = string + ">" + employeeObj[i]['employeeName'] + "</option>";
+                                }
+                                $('#employee_name').append(string);
+                            }
+                            
+                            for (var i = 0; i < tbObj.length; i++) {
+                                var tbArray = ConvertObjectToArray(tbObj[i]);
+                                oTable.fnAddData(tbArray);
+                            }
+                        } else {
+                            swal("Failed", "Not found", "warning");
+                        }
+                    },
+                    error: function (req, status, error) {
+                        swal("Failed", "Connection Error", "warning");
+                    }
+                });
+            }
+
+            function initBonusDeductionModal() {
+                clearButtons("new");
+                var form = $('#__AjaxAntiForgeryForm');
+                var token = $('input[name="__RequestVerificationToken"]', form).val();
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("BonusDeduction_Load")",
+                    data: {
+                        __RequestVerificationToken: token,
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        if (response["success"] == "true") {
+                            var employeeObj = JSON.parse(response["comboData"]);
+                            var today = response["today"];
+                            setBonusDeductionModal(today, thisMonth, "", employeeObj, "", "");
+                            
+                        } else {
+                            swal("Failed", "Not found", "warning");
+                        }
+                    },
+                    error: function (req, status, error) {
+                        swal("Failed", "Connection Error", "warning");
+                    }
+                });
+            }
+
+            function clearButtons(type) {
+                if (type == "new") {
+                    $("#sub_title").text("Create Bonus or Deduction");
+                    $("#bonus_save").text("Save");
+                    $("#bonus_delete").hide();
+                    $("#bonus_month").attr('disabled', false);
+                    $("#bonus_employeeCode").attr('disabled', false);
+                }
+                else {
+                    $("#sub_title").text("Edit Bonus or Deduction");
+                    $("#bonus_save").text("Update");
+                    $("#bonus_delete").show();
+                    $("#bonus_month").attr('disabled', true);
+                    $("#bonus_employeeCode").attr('disabled', true);
+                }
+            }
+
+            function setBonusDeductionModal(date, month, deductionAmount, employeeObj, bonusAmount, narration) {
+                $("#bonus_date").val(date);
+                $("#bonus_month").val(month);
+                $("#deduction_amount").val(deductionAmount);
+                $("#bonus_amount").val(bonusAmount);
+                $("#bonus_narration").val(narration);
+
+                $('#bonus_employeeCode option').remove();
+                var string = "";
+                for (var i = 0; i < employeeObj.length; i++) {
+                    string = string + "<option value='" + employeeObj[i]['employeeId'] + "'";
+                    string = string + ">" + employeeObj[i]['employeeCode'] + "</option>";
+                }
+                $('#bonus_employeeCode').append(string);
+                $('#bonus_employeeCode').val(-1);
+            }
+
+            function onSaveOrEditBonusDeduction(btnStatus, employeeId, date, month,
+                bonusAmount, deductionAmount, narration, bonusId) {
+                swal({
+                    title: "Are you sure?",
+                    text: "You will be able to " + btnStatus.toLowerCase() + " these data!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, " + btnStatus.toLowerCase() + " it!",
+                    closeOnConfirm: false
+                }, function () {
+                    var form = $('#__AjaxAntiForgeryForm');
+                    var token = $('input[name="__RequestVerificationToken"]', form).val();
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("SaveOrEditBonusDeduction")",
+                        data: {
+                            __RequestVerificationToken: token,
+                            btnStatus: btnStatus,
+                            employeeId: employeeId,
+                            date: date,
+                            month: month,
+                            bonusAmount: bonusAmount,
+                            deductionAmount: deductionAmount,
+                            narration: narration,
+                            bonusId: bonusId
+                        },
+                        dataType: "json",
+                        success: function (response) {
+                            if (response["success"] == "false") {
+                                swal("Failed", "Not found", "warning");
+                            }
+                            else {
+                                if (response["ex"] == "no") {
+
+                                    if (response["message"] == "") {
+                                        initTable();
+                                        swal(btnStatus + "!", "Attendance data has been " + btnStatus.toLowerCase() + "d.", "success");
+                                        $('#bonusDeductionModal').modal('hide');
+                                    }
+                                    else
+                                        swal("Failed", response["message"], "warning");
+                                }
+                                else
+                                    alert(response["ex"]);
+                            }
+                        },
+                        error: function (req, status, error) {
+                            swal("Failed", "Connection Error", "warning");
+                        }
+                    });
+                });
+            }
+
+            $('.dataTables-bonusDeductionReg tbody').on('click', 'td', function () {
+                var trPos = oTable.fnGetPosition(this);
+                var aData = oTable.fnGetData(trPos);
+                bonusDeductionId = aData[6];
+                                       
+                clearButtons("edit");
+                var form = $('#__AjaxAntiForgeryForm');
+                var token = $('input[name="__RequestVerificationToken"]', form).val();
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("BonusDeductionEdit_Load")",
+                    data: {
+                        __RequestVerificationToken: token,
+                        bonusDeductionId: bonusDeductionId
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        if (response["success"] == "true") {
+                            if (response["ex"] == "no") {
+                                var employeeObj = JSON.parse(response["data"]["employeeCodes"]);
+                                setBonusDeductionModal(response["data"]["date"], response["data"]["month"], response["data"]["deductionAmount"],
+                                    employeeObj, response["data"]["bonusAmount"], response["data"]["narration"]);
+
+                                $('#bonus_employeeCode').val(response["data"]["employeeId"]);
+                            }
+                            else
+                                alert(response["ex"]);                               
+                        } else {
+                            swal("Failed", "Not found", "warning");
+                        }
+                    },
+                    error: function (req, status, error) {
+                        swal("Failed", "Connection Error", "warning");
+                    }
+                });
+                $('#bonusDeductionModal').modal('show');
+            });            
+        });
+    </script>
+}

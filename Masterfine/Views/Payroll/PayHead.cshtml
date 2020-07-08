@@ -1,0 +1,239 @@
+﻿@using System.Data
+@{
+    ViewBag.Title = "PayHead";
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Pay Head</h2>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Main", "Home")">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a>Payroll</a>
+            </li>
+            <li class="active breadcrumb-item">
+                <strong>Pay Head</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+
+                    <table class="table table-striped table-bordered table-hover dataTables-payhead">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Payhead Name</th>
+                                <th>Type</th>
+                                <th>Created Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (DataRow row in Model.Rows)
+                            {
+                            <tr value='@row["payHeadId"]' style="cursor:pointer;" class="row_data">
+                                <td>@row["slNo"]</td>
+                                <td>@row["payHeadName"]</td>
+                                <td>@row["type"]</td>
+                                <td>@row["extraDate"]</td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div class="modal inmodal fade" id="payheadModal" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                    <h4 class="modal-title">New Payhead</h4>
+                                    <small class="font-bold">Create a new payhead</small>
+                                </div>
+                                <form method="POST" action="AddPayhead">
+                                    <div class="modal-body">
+
+                                        <div class="form-group"><label>Name</label> <input type="text" placeholder="Enter payhead name" name="payheadName" class="form-control" required></div>
+                                        <div class="form-group"><label>Type</label> 
+                                            <select name="type" class="form-control" id="type">
+                                                <option value="Addition">Addition</option>
+                                                <option value="Deduction">Deduction</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group"><label>Narration</label> <textarea class="form-control" name="narration" rows="3"></textarea></div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Create</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal inmodal fade" id="payheadEdit" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                    <h4 class="modal-title">Payhead</h4>
+                                    <small class="font-bold">Edit or View payhead</small>
+                                </div>
+                                <form method="POST" action="EditPayhead">
+                                    <div class="modal-body">
+                                        <div class="form-group"><label>Payhead ID</label> <input type="text" placeholder="" name="e_payheadId" id="e_payheadId" class="form-control" readonly></div>
+                                        <div class="form-group"><label>Name</label> <input type="text" placeholder="" name="e_payheadName" id="e_payheadName" class="form-control" required></div>
+                                        <div class="form-group">
+                                            <label>Type</label>
+                                            <select name="e_type" class="form-control" id="e_type">
+                                                <option value="Addition">Addition</option>
+                                                <option value="Deduction">Deduction</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group"><label>Narration</label> <textarea class="form-control" name="e_narration" id="e_narration" rows="3"></textarea></div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-danger">Delete</button>
+                                        <button type="submit" class="btn btn-primary">Save</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link rel="stylesheet" href="~/lib/dataTables/datatables.min.css" />
+        <link rel="stylesheet" href="~/lib/sweetalert/dist/sweetalert.css" />
+    </environment>
+}
+
+@section Scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/lib/dataTables/datatables.min.js"></script>
+        <script src="~/lib/dataTables/dataTables.bootstrap4.min.js"></script>
+        <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
+    </environment>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var tr = null;
+            $('.dataTables-payhead').DataTable({
+                pageLength: 100,
+                dom: '<"html5buttons"B>lTfgitp',
+                buttons: [
+                    {
+                        text: 'New Payhead',
+                        action: function (e, dt, node, config) {
+                            $('#payheadModal').modal('show');
+                        }
+                    }
+                ]
+            });
+            $("#payheadEdit").on("click", ".btn-danger",function () {
+                var table = $('.dataTables-payhead').DataTable();
+                var id = $("#e_payheadId").val();
+
+                swal({
+                    title: "Are you sure?",
+                    text: "You will not be able to recover this payhead!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, delete it!",
+                    closeOnConfirm: false
+                }, function () {
+                    var form = $('#__AjaxAntiForgeryForm');
+                    var token = $('input[name="__RequestVerificationToken"]', form).val();
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("DeletePayhead")",
+                        data: {
+                            __RequestVerificationToken: token,
+                            id: id
+                        },
+                        dataType: "text",
+                        success: function (msg) {
+
+                            if (msg == "success") {
+                                table.row(tr).remove().draw();
+                                $('#payheadEdit').modal('hide');
+                                swal("Deleted!", "Selected payhead has been deleted.", "success");
+                            }
+                            else if (msg == "error") {
+                                swal("Failed", "You can't delete, reference exist.", "warning");
+                            }
+                            else if (msg == "failed") {
+                                swal("Failed", "Database Connection Error", "warning");
+                            }
+                        },
+                        error: function (req, status, error) {
+                            swal("Failed", "API Server Connection Error", "warning");
+                        }
+                    });
+
+                });
+            })
+            $(".dataTables-payhead").on("click", ".row_data",function () {
+                tr = $(this).closest('tr');
+                var id = tr.attr("value");
+                var form = $('#__AjaxAntiForgeryForm');
+                    var token = $('input[name="__RequestVerificationToken"]', form).val();
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("GetPayhead")",
+                        data: {
+                            __RequestVerificationToken: token,
+                            id: id
+                        },
+                        dataType: "json",
+                        success: function (res) {
+
+                            if (res.error == "false") {
+                                $("#e_payheadId").val(res.payheadId);
+                                $("#e_payheadName").val(res.payheadName);
+                                $("#e_type").val(res.type);
+                                $("#e_narration").val(res.narration);
+                            } else {
+                                swal("Failed", "Not Found.", "warning");
+                            }
+                        },
+                        error: function (req, status, error) {
+                            swal("Failed", "Connection Error", "warning");
+                        }
+                    });
+                $('#payheadEdit').modal('show');
+            })
+        });
+
+
+    </script>
+}

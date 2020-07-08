@@ -1,0 +1,148 @@
+﻿@using System.Data
+@{
+    ViewData["Title"] = "PaySlip";
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Pay Slip</h2>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Main", "Home")">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a>Payroll</a>
+            </li>
+            <li class="active breadcrumb-item">
+                <strong>Pay Slip</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-lg-2">
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="form-group row">
+                                <label class="control-label col-lg-4">Salary Month</label>
+                                <div class="col-lg-8">
+                                    <input type="month" class="form-control" id="salaryMonth" value="@ViewData["salaryMonth"]" name="salaryMonth" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-lg-4">Employee</label>
+                                <div class="col-lg-8">
+                                    <select name="employeeCombo" class="form-control" id="employeeCombo" required>
+                                        @foreach (DataRow row in Model.Rows)
+                                        {
+                                            <option value='@row["employeeId"]' class="row_data">@row["employeeName"]</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-lg-8"></div>
+                                <div class="col-lg-4">
+                                    <button type="submit" class="btn btn-primary" onclick="on_print();">Print</button>
+                                    
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-lg-2"></div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-lg-12" id="rptReportDiv" style="display:none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+    </div>
+
+</div>
+
+@section Styles {
+<environment names="Development,Staging,Production">
+    <link rel="stylesheet" href="~/lib/sweetalert/dist/sweetalert.css" />
+</environment>
+}
+
+@section Scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
+    </environment>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+
+        });
+        function on_print(){
+            var salaryMonth = $('#salaryMonth').val();
+            var cmbEmployeeID = $('#employeeCombo').val();
+            var cmbEmployeeName = $('#employeeCombo').find("option[value='" + cmbEmployeeID + "']").text();
+            var token = $('input[name="__RequestVerificationToken"]', $('#__AjaxAntiForgeryForm')).val();
+             $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Print")",
+                    data: {
+                        __RequestVerificationToken: token,
+                        salaryMonth: salaryMonth,
+                        cmbEmployeeID: cmbEmployeeID,
+                        cmbEmployeeName: cmbEmployeeName
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        if (response.success == "success") {
+                            $("#rptReportDiv").html(response.data);
+
+                            var prtContent = document.getElementById('DivPrint');
+                            var WinPrint = window.open('', '', 'left=0,top=0,width=780,height=600,toolbar=0,scrollbars=1,status=1');
+                            WinPrint.document.write(prtContent.innerHTML);
+                            WinPrint.document.close();
+                            WinPrint.focus();
+                            WinPrint.print();
+                            WinPrint.close();
+                            prtContent.innerHTML = strOldOne;
+                            //swal("Printed", "Printing is successed!", "success");
+                        }
+                        else {
+                            swal("Failed", response.data, "warning");
+                        }
+                        //refresh_EmployeeCombo(response["data"]);
+                    },
+                    error: function (req, status, error) {
+                        swal("Failed", "API Server Connection Error", "warning");
+                    }
+             });    
+            
+        }
+
+    </script>
+}

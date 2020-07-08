@@ -1,0 +1,700 @@
+﻿@using System.Data
+@{
+    ViewData["Title"] = "SalaryPackage";
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Salary Package</h2>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Main", "Home")">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a>Payroll</a>
+            </li>
+            <li class="active breadcrumb-item">
+                <strong>Salary Package</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-down"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div id="salary_package_filter" class="ibox-content" style="display:none;">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="form-group col-6"><label>Name</label> <input type="text" placeholder="Enter Salary Package Name" name="salary_package_name" class="form-control" required></div>
+                            <div class="form-group col-6">
+                                <label>Active</label>
+                                <select name="salary_package_active" class="form-control">
+                                    <option value="All">All</option>
+                                    <option value="True">Yes</option>
+                                    <option value="False">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info offset-9" onclick="on_search_salary_packages();">Search</button>
+                        <button type="button" class="btn btn-info offset-1" onclick="on_clear_filters_salary_package();">Clear</button>
+                    </div>
+                </div>
+            </div>
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <table id="salary_package_table" class="table table-striped table-bordered table-hover dataTables-salary">
+                        <thead>
+                            <tr>
+                                <th>SI No</th>
+                                <th>Package Name</th>
+                                <th>Active</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- contents-->
+                        </tbody>
+                    </table>
+                    <div class="modal inmodal fade" id="edit_modal_salary_package" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                    <h4 class="modal-title">New Salary Package</h4>
+                                    <small class="font-bold">salary package</small>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="form-group col-6" id="e_salary_package_id" value="0"><label>Name</label> <input id="e_salary_package_name" type="text" placeholder="Enter Salary Package Name" name="salaryPackageName" class="form-control" required></div>
+                                        <div class="form-group col-6">
+                                            <label>Active</label>
+                                            <select name="isActive" class="form-control" id="e_active">
+                                                <option value="true">Yes</option>
+                                                <option value="false">No</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group"><label>Narration</label> <textarea id="e_narration" class="form-control" name="narration" rows="3"></textarea></div>
+                                    <table id="salary_package_details_table" class="table table-striped table-bordered table-hover dataTables-salaryInter">
+                                        <thead>
+                                            <tr>
+                                                <th>SI No</th>
+                                                <th>Payhead</th>
+                                                <th>Type</th>
+                                                <th>Amount</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- contents-->
+                                        </tbody>
+                                    </table>
+                                    <div class="row">
+                                        <div class="col-9"></div>
+                                        <div class="col-3">
+                                            <!--<button type="button" class="form-group btn btn-danger">Remove</button>-->
+                                            <div class="form-group row">
+                                                <h4 class="col-3">Salary:</h4>
+                                                <h4 id="total_salary" name="salary" class="col-6">150</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-danger">Delete</button>
+                                    <button type="button" class="btn btn-primary">Create</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+         </div>
+    </div>
+</div>
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link rel="stylesheet" href="~/lib/dataTables/datatables.min.css" />
+        <link rel="stylesheet" href="~/lib/sweetalert/dist/sweetalert.css" />
+    </environment>
+}
+
+@section Scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/lib/dataTables/datatables.min.js"></script>
+        <script src="~/lib/dataTables/dataTables.bootstrap4.min.js"></script>
+        <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
+        <script src="~/js/common.js"></script>
+    </environment>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#edit_modal_salary_package").on("click", ".btn-primary", function () {
+                on_click_save_salary_package();
+            });
+
+            $("#edit_modal_salary_package").on("click", ".btn-danger", function () {
+                on_click_delete_salary_package();
+            });
+
+            init_salary_package_data_table();
+            on_search_salary_packages();
+
+        });
+
+        var oSalaryPackageTable;
+        var salary_package_count = 0;
+        function init_salary_package_data_table() {
+            oSalaryPackageTable = $('.dataTables-salary').dataTable({
+                pageLength: 100,
+                dom: '<"html5buttons"B>lTfgitp',
+                buttons: [
+                    {
+                        text: 'New Package',
+                        action: function (e, dt, node, config) {
+                            on_click_new_package();
+                        }
+                    }
+                ],
+                "columnDefs": [
+                    /*
+                     * full[0]-SL.NO
+                     * full[1]-salaryPackageId
+                     * full[2]-salaryPackageName
+                     * full[3]-isActive
+                     * full[4]-totalAmount
+                     */
+                    {
+                        targets: [0],
+                        render: function (o, v) {
+                            return o;
+                        },
+                    },
+                    {
+                        targets: [1],
+                        render: function (data, type, full) {
+                            var salaryPackageName = full[2];
+                            return salaryPackageName;
+                        },
+                    },
+                    {
+                        targets: [2],
+                        render: function (data, type, full) {
+                            var isActive = full[3] == 1 ? "Yes" : "No";
+                            return isActive;
+                        },
+                    },
+                    {
+                        targets: [3],
+                        render: function (data, type, full) {
+                            var totalAmount = full[4]
+                            return totalAmount;
+                        },
+                    }
+                ],
+            });
+        }
+
+        function on_click_new_package() {
+            editing_tr = null;
+            var form = $('#__AjaxAntiForgeryForm');
+            var token = $('input[name="__RequestVerificationToken"]', form).val();
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetSalaryPackageDetails")",
+                data: {
+                    __RequestVerificationToken: token,
+                    salaryPackageId: 0
+                },
+                dataType: "json",
+                success: function (response) {
+                    console.log(response);
+                    if (response.message == "success") {
+                        data = response.data;
+                        lastNo = 0;
+                        $("#e_salary_package_id").attr("value", 0);
+                        $("#e_salary_package_name").val("New Salary");
+                        $("#e_active").val("false");
+                        $("#e_narration").val("");
+                        load_payheads(data.payHeads);
+                        var details = [];
+                        refresh_salary_package_details_table(details);
+                        show_edit_salary_package_modal(true);
+                    } else {
+                        swal("Failed", "Not found", "warning");
+                    }
+                },
+                error: function (req, status, error) {
+                    swal("Failed", "Connection Error", "warning");
+                }
+            });
+        }
+        function on_search_salary_packages() {
+            var package_name = $("#salary_package_filter input[name='salary_package_name']").val();
+            var package_active_status = $("#salary_package_filter select[name='salary_package_active']").val();
+            var token = $('input[name="__RequestVerificationToken"]', $('#__AjaxAntiForgeryForm')).val();
+            $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("SalaryPackageSearch")",
+                    data: {
+                        __RequestVerificationToken: token,
+                        packageName: package_name,
+                        status: package_active_status
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        refresh_salary_package_table(response.data);
+                    },
+                    error: function (req, status, error) {
+                        swal("Failed", "API Server Connection Error", "warning");
+                    }
+             });
+        }
+
+        function trigger_salary_package_row_onclick() {
+            $(".dataTables-salary tr").on("click", function () {
+                on_click_salary_package_table_row_data($(this));
+            });
+        }
+
+        function refresh_salary_package_table(data) {
+            oSalaryPackageTable.fnClearTable(false);
+            var info = JSON.parse(data);
+            
+            for (var i = 0; i < info.length; i++) {
+                var row_data = ConvertObjectToArray(info[i]);
+                oSalaryPackageTable.fnAddData(row_data);
+            }
+
+            trigger_salary_package_row_onclick();
+        }
+        
+        function on_clear_filters_salary_package() {
+            $("#salary_package_filter input[name='salary_package_name']").val("");
+            $("#salary_package_filter select[name='salary_package_active']").val("All");
+        }
+
+        var arr_payheads = [];
+        var selected_payhead_ids = [];
+        var lastNo = 0;
+        var editing_tr;
+        function on_click_salary_package_table_row_data(element) {
+            editing_tr = element;
+            var row_data = oSalaryPackageTable.fnGetData(element);
+            var id = row_data[1];
+            var form = $('#__AjaxAntiForgeryForm');
+            var token = $('input[name="__RequestVerificationToken"]', form).val();
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetSalaryPackageDetails")",
+                data: {
+                    __RequestVerificationToken: token,
+                    salaryPackageId: id
+                },
+                dataType: "json",
+                success: function (response) {
+                    console.log(response);
+                    if (response.message == "success") {
+                        data = response.data;
+                        lastNo = 0;
+                        $("#e_salary_package_id").attr("value", data.salaryPackageId);
+                        $("#e_salary_package_name").val(data.salaryPackageName); 
+                        $("#e_active").val(data.isActive == true ? "true" : "false");
+                        $("#e_narration").val(data.narration);
+                        load_payheads(data.payHeads);
+                        var details = JSON.parse(data.salaryPackageDetails);
+                        refresh_salary_package_details_table(details);
+                    } else {
+                        swal("Failed", "Not found", "warning");
+                    }
+                    show_edit_salary_package_modal(false);
+                },
+                error: function (req, status, error) {
+                    swal("Failed", "Connection Error", "warning");
+                }
+            });
+        }
+        //edit salary pacakge modal dialog
+        function show_edit_salary_package_modal(is_create_modal) {
+            $('#edit_modal_salary_package').modal('show');
+            if (is_create_modal) {
+                $('#edit_modal_salary_package button.btn-primary').text("Create");
+                $('#edit_modal_salary_package button.btn-danger').hide();
+                $("#edit_modal_salary_package .modal-header .modal-title").text("New Salary Package");
+                $("#edit_modal_salary_package .modal-header .fon-bold").text("Create a new salary package");
+            }
+            else {
+                $('#edit_modal_salary_package button.btn-primary').text("Update");
+                $('#edit_modal_salary_package button.btn-danger').show();
+                $("#edit_modal_salary_package .modal-header .modal-title").text("Salary Package");
+                $("#edit_modal_salary_package .modal-header .fon-bold").text("Edit this salary package");
+            }
+        }
+
+        function refresh_salary_package_details_table(details) {
+            console.log(details);
+            var tbody = $("#salary_package_details_table tbody");
+            tbody.find("tr").remove(); // remove all rows;
+            var info = details;
+            console.log(info);
+            var string = "";
+            for (var i = 0; i < info.length; i++) {
+                string = '<tr class="row_data" style="cusor:pointer">';
+                string = string + "<td>" + info[i]["SL.NO"] + "</td>";
+                string = string + "<td name='select_payhead_id'>" + make_payheads_selects(info[i]["payHeadId"]) + "</td>";
+                string = string + "<td name='payhead_type'>" + get_payhead_type(info[i]["payHeadId"]) + "</td>";
+                string = string + "<td>" + "<input type='number' style='width:100%;' name='salary_package_details_amount' value='" + info[i]["Amount"] + "'></td>";
+                string = string + "<td>" + "<a href='#' onClick='on_remove_salary_package_detail($(this));'><i class='fa fa-close text-navy'></i></a>"
+                string = string + '</tr>';
+                tbody.append(string); // add row;
+                lastNo++;
+            }
+
+            //refresh payhead selects
+            var payhead_selects = $("#salary_package_details_table select[name='select_payhead']");
+            for (var i = payhead_selects.length - 1; i >= 0; i--) {
+                var obj_select = payhead_selects.eq(i);
+                changed_select_payhead(obj_select, 0, obj_select.val());
+            }
+            
+            make_template_package_details_row();
+            trigger_payhead_select();
+
+            $("#salary_package_details_table input[name='salary_package_details_amount']").on("change", function () {
+                calculate_salary_amounts();
+            });
+            calculate_salary_amounts();
+        }
+
+        function trigger_payhead_select() {
+            $("#salary_package_details_table select[name='select_payhead']").on("change", function () {
+                on_select_payhead_in_details($(this));
+            });
+        }
+
+        function on_remove_salary_package_detail(element, index) {
+            swal({
+                title: "Are you sure?",
+                text: "You will not be able to recover this payhead!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, delete it!",
+                closeOnConfirm: true,
+            }, function () {
+                var payhead_id = element.closest("tr").find("select").val();
+                element.closest("tr").remove();
+                calculate_salary_amounts();
+                changed_select_payhead(null, payhead_id, 0);
+            });
+
+        }
+
+        function on_add_salary_package_detail(element) {
+            var payhead_id = $("#salary_package_details_table tr[value='template'] select[name='select_payhead']").val();
+            if (!payhead_id) {
+                swal("Warning", "Please select payhead!", "warning");
+                return;
+            }
+            
+            element.children(":first").removeClass("fa-check").addClass("fa-close");
+            var parent_tr = element.closest("tr");
+            
+            lastNo++;
+            parent_tr.children(":first").text(lastNo);
+            parent_tr.attr("value", "");
+            make_template_package_details_row();
+            trigger_payhead_select();
+            changed_select_payhead(element.closest("tr").find("select"), 0, payhead_id);
+            element.attr("onClick", "on_remove_salary_package_detail($(this));");
+            calculate_salary_amounts();
+        }
+
+        function calculate_salary_amounts() {
+            var total_salary = 0;
+            var td_payhead_types = $("#salary_package_details_table td[name='payhead_type']");
+            $("#salary_package_details_table input[name='salary_package_details_amount']").each(function () {
+                var fa_i = $(this).closest("tr").find("i.fa-close");
+                if (fa_i.length > 0) { // template row could not be added in total salary amount
+                    if ($(this).closest("td").prev().text() == "Addition") {
+                        total_salary = total_salary + parseInt($(this).val());
+                    }
+                    else if ($(this).closest("td").prev().text() == "Deduction") {
+                        total_salary = total_salary - parseInt($(this).val());
+                    }
+                }
+                $("#total_salary").text(total_salary);
+            });
+        }
+
+        function make_template_package_details_row() {
+            var string = "";
+            string = '<tr value="template" class="row_data" style="cusor:pointer">';
+            string = string + "<td>" + "</td>";
+            string = string + "<td name='select_payhead_id'>" + make_payheads_selects(0) + "</td>";
+            string = string + "<td name='payhead_type'>" + get_payhead_type(0) + "</td>";
+            string = string + "<td>" + "<input type='number' style='width:100%;' name='salary_package_details_amount' value='0'></td>";
+            string = string + "<td>" + "<a href='#' onClick='on_add_salary_package_detail($(this));'><i class='fa fa-check text-navy'></i></a>"
+            string = string + '</tr>';
+            $("#salary_package_details_table tbody").append(string);
+            $("#salary_package_details_table tr[value='template'] select").val(0);
+            
+        }
+        // pay_heads
+        function load_payheads(payheads) {
+            arr_payheads = JSON.parse(payheads);
+            selected_payhead_ids = [];
+        }
+
+        function make_payheads_selects(pay_head_id) {
+            var string = "";
+            string = "<select name='select_payhead' old-value='" + pay_head_id + "' style='width:100%;'>";
+            for (var i = 0; i < arr_payheads.length; i++) {
+                var payHeadId = arr_payheads[i]["payHeadId"];
+                if (pay_head_id == payHeadId) {
+                    string = string + "<option value='" + payHeadId + "' selected>" + arr_payheads[i]["payHeadName"] + "</option>";
+                    if (is_selected_payhead_id(payHeadId) == false) {
+                        selected_payhead_ids.push(payHeadId);
+                    }
+                }
+                else {
+                    if (is_selected_payhead_id(payHeadId) == false) {
+                        string = string + "<option value='" + payHeadId + "'>" + arr_payheads[i]["payHeadName"] + "</option>";
+                    }
+                }
+            }
+            string = string + "</select>";
+            return string;
+        }
+
+        function is_selected_payhead_id(pay_head_id) {
+            var is_selected = false;
+            for (var i = 0; i < selected_payhead_ids.length; i++) {
+                if (pay_head_id == selected_payhead_ids[i]) {
+                    is_selected = true;
+                    break;
+                }
+            }
+
+            return is_selected;
+
+        }
+
+        function get_payhead_type(pay_head_id) {
+            var type = ""
+            for (var i = 0; i < arr_payheads.length; i++) {
+                if (pay_head_id == arr_payheads[i]["payHeadId"]) {
+                    type = arr_payheads[i]["type"];
+                    break;
+                }
+            }
+
+            return type;
+        }
+
+        function get_payhead_name(pay_head_id) {
+            var payhead_name = ""
+            for (var i = 0; i < arr_payheads.length; i++) {
+                if (pay_head_id == arr_payheads[i]["payHeadId"]) {
+                    payhead_name = arr_payheads[i]["payHeadName"];
+                    break;
+                }
+            }
+
+            return payhead_name;
+        }
+
+        function on_select_payhead_in_details(element) {
+            var td_type = element.closest("td").next();
+            td_type.text(get_payhead_type(element.val()));
+            changed_select_payhead(element, element.attr("old-value"), element.val());
+            calculate_salary_amounts();
+        }
+
+        function changed_select_payhead(element, old_id, new_id) {
+            for (var i = 0; i < selected_payhead_ids.length; i++) {
+                if (old_id == selected_payhead_ids[i]) {
+                    selected_payhead_ids.splice(i, 2);
+                    break;
+                }
+            }
+            if (new_id)
+                selected_payhead_ids.push(new_id);
+            console.log(selected_payhead_ids);
+            
+            $("#salary_package_details_table select[name='select_payhead']").each(function (index, currentElement) {
+
+                if (!element || (element && element[0] != currentElement)) {
+                    var old_value = $(this).attr("old-value");
+                    $(this).find("option[value='" + new_id + "']").remove();
+                    if (old_id > 0) {
+                        $(this).append("<option value='" + old_id + "' >" + get_payhead_name(old_id) + "</option >");
+                    }
+                    $(this).val(old_value);
+                }
+                else {
+                    $(this).attr("old-value", new_id);
+                }
+            });
+
+        }
+
+        //save, delete salary_package
+        function on_click_delete_salary_package() {
+            var form = $('#__AjaxAntiForgeryForm');
+            var token = $('input[name="__RequestVerificationToken"]', form).val();
+            var salary_package_id = $("#e_salary_package_id").attr("value");
+            if (!salary_package_id)
+                return;
+            swal({
+                title: "Are you sure?",
+                text: "You will not be able to recover this Salary Package!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, delete it!",
+                closeOnConfirm: false
+            }, function () {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("DeleteSalaryPackage")",
+                    data: {
+                        __RequestVerificationToken: token,
+                        salaryPackageId: salary_package_id
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.isSuccess == true) {
+                            $("#edit_modal_salary_package").modal("hide");
+                            swal("Deleted", "This Salary Package has been deleted.", "success");
+                            oSalaryPackageTable.fnDeleteRow(editing_tr);
+                        }
+                        else if (response.isSuccess == false) {
+                            swal("Failed", response.message, "warning");
+                        }
+                    },
+                    error: function (req, status, error) {
+                        swal("Failed", "API Server Connection Error", "warning");
+                    }
+                });
+            });
+
+        }
+
+        function on_click_save_salary_package() {
+            var total_salary = $("#total_salary").text();
+            if (!total_salary || total_salary <= 0) {
+                swal("Warning", "Salary amount must be than zero!", "warning");
+                return;
+            }
+            var form = $('#__AjaxAntiForgeryForm');
+            var token = $('input[name="__RequestVerificationToken"]', form).val();
+            var salary_package_id = $("#e_salary_package_id").attr("value");
+            var salary_package_name = $("#e_salary_package_name").val();
+            if (salary_package_name == "" || salary_package_name == null) {
+                swal("Warning", "Salary Package Name is required!", "warning");
+                return;
+            }
+            var active = $("#e_active").val();
+            var narration = $("#e_narration").val();
+            if (narration == "" || narration == null || !narration) {
+                swal("Warning", "Narration is required!", "warning");
+                return;
+            }
+            var details = [];
+            $("#salary_package_details_table tbody tr").each(function () {
+                var payhead_id = $(this).find("td select").val();
+                var amount = $(this).find("td input").val();
+                var slno = $(this).children(":first").text();
+                if (slno) {
+                    details.push({ payHeadId: payhead_id, Amount: amount, SalaryPackageId: salary_package_id, Narration: narration });
+                }
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SaveSalaryPackage")",
+                data: {
+                    __RequestVerificationToken: token,
+                    salaryPackageId: salary_package_id,
+                    salaryPackageName: salary_package_name,
+                    active: active,
+                    narration: narration,
+                    jsonDetails: JSON.stringify(details),
+                    totalAmount : total_salary
+                },
+                dataType: "json",
+                success: function (response) {
+                    console.log(response);
+                    if (response.isSuccess == true) {
+                        update_salary_package_table(response.data);
+                        swal("Saved", "This SalaryPackage has been saved successfully.", "success");
+                        $('#edit_modal_salary_package').modal('hide');
+                    }
+                    else {
+                        swal("Failed", "You can't save this SalaryPackage, reference exist.", "warning");
+                    }
+                },
+                error: function (req, status, error) {
+                    swal("Failed", "API Server Connection Error", "warning");
+                }
+            });
+        }
+
+        function update_salary_package_table(info) {
+            if (editing_tr) {
+                var row_data = oSalaryPackageTable.fnGetData(editing_tr);
+                row_data[2] = info.salaryPackageName;
+                row_data[3] = (info.isActive == 1 ? "Yes" : "No");
+                row_data[4] = info.totalAmount;
+                oSalaryPackageTable.fnUpdate(row_data, editing_tr);
+            }
+            else {
+                var row_data = [];
+                var slNo = oSalaryPackageTable.fnGetData().length + 1;
+                row_data.push(slNo);
+                row_data.push(info.salaryPackageId);
+                row_data.push(info.salaryPackageName);
+                row_data.push(info.isActive == 1 ? "Yes" : "No");
+                row_data.push(info.totalAmount);
+                oSalaryPackageTable.fnAddData(row_data);
+                trigger_salary_package_row_onclick();
+                on_search_salary_packages();
+            }
+        }
+    </script>
+}

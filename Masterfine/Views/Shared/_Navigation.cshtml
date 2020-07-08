@@ -1,0 +1,43 @@
+﻿<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar-collapse">
+        <ul class="nav metismenu" id="side-menu">
+            <li class="nav-header">
+                <div class="dropdown profile-element">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                        <span class="block m-t-xs font-bold">Username</span>
+                        <span class="text-muted text-xs block">Title <b class="caret"></b></span>
+                    </a>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs" style="position: absolute; top: 91px; left: 0px; will-change: top, left;">
+                        <li><a class="dropdown-item" href="#">Logout</a></li>
+                    </ul>
+                </div>
+                <div class="logo-element">
+                    IN+
+                </div>
+            </li>
+            <li class="@Html.IsSelected(controller: "Home", action: "Main")">
+                <a href="@Url.Action("Main", "Home")"><i class="fa fa-diamond"></i> <span class="nav-label">Main</span> <span class="label label-primary float-right">Main</span></a>
+            </li>
+            <li class="@Html.IsSelected(controller: "Payroll")">
+                <a href="#"><i class="fa fa-server"></i> <span class="nav-label">Payroll</span><span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse @Html.IsSelected(controller: "Payroll", cssClass: "in")">
+                    <li class="@Html.IsSelected(action: "Designation")"><a href="@Url.Action("Designation", "Payroll")">Designation</a></li>
+                    <li class="@Html.IsSelected(action: "PayHead")"><a href="@Url.Action("PayHead", "Payroll")">Pay Head</a></li>
+                    <li class="@Html.IsSelected(action: "SalaryPackage")"><a href="@Url.Action("SalaryPackage", "Payroll")">Salary Package</a></li>
+                    <li class="@Html.IsSelected(action: "Employee")"><a href="@Url.Action("Employee", "Payroll")">Employee</a></li>
+                    <li class="@Html.IsSelected(action: "HolidaySettings")"><a href="@Url.Action("HolidaySettings", "Payroll")">Holiday Settings</a></li>
+                    <li class="@Html.IsSelected(action: "MonthlySalarySettings")"><a href="@Url.Action("MonthlySalarySettings", "Payroll")">Monthly Salary Settings</a></li>
+                    <li class="@Html.IsSelected(action: "Attendance")"><a href="@Url.Action("Attendance", "Payroll")">Attendance</a></li>
+                    <li class="@Html.IsSelected(action: "AdvanceRegister")"><a href="@Url.Action("AdvanceRegister", "Payroll")">Advance Register</a></li>
+                    <li class="@Html.IsSelected(action: "BonusDeduction")"><a href="@Url.Action("BonusDeduction", "Payroll")">Bonus Deduction</a></li>
+                    <!--<li class="@Html.IsSelected(action: "BonusDeductionRegister")"><a href="@Url.Action("BonusDeductionRegister", "Payroll")">Bonus Deduction Register</a></li>-->
+                    <li class="@Html.IsSelected(action: "MonthlySalaryVoucher")"><a href="@Url.Action("MonthlySalaryVoucher", "Payroll")">Monthly Salary</a></li>
+                    <!--<li class="@Html.IsSelected(action: "MonthlySalaryRegister")"><a href="@Url.Action("MonthlySalaryRegister", "Payroll")">Monthly Salary Register</a></li>-->
+                    <li class="@Html.IsSelected(action: "DailySalaryVoucher")"><a href="@Url.Action("DailySalaryVoucher", "Payroll")">Daily Salary</a></li>
+                    <!--<li class="@Html.IsSelected(action: "DailySalaryRegister")"><a href="@Url.Action("DailySalaryRegister", "Payroll")">Daily Salary Register</a></li>-->
+                    <li class="@Html.IsSelected(action: "PaySlip")"><a href="@Url.Action("PaySlip", "Payroll")">Pay Slip</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+</nav>

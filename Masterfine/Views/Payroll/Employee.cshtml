@@ -1,0 +1,894 @@
+﻿@using System.Data
+@{
+    ViewData["Title"] = "EmployeeRegister";
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Employee</h2>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Main", "Home")">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a>Payroll</a>
+            </li>
+            <li class="active breadcrumb-item">
+                <strong>Employee Register</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+           <div class="ibox ">
+                <div class="ibox-title">
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-down"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div id="employee_filter" class="ibox-content" style="display:none;">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group"><label>Employee Code</label> <input id="search-employeeCode" type="text" placeholder="Enter employee Code" name="employeeCode" class="form-control" required></div>
+                                <div class="form-group">
+                                    <label>Designation</label>
+                                    <select name="designation" class="form-control" id="search-designation">
+                                        @foreach (DataRow row in ((DataTable)ViewData["designations"]).Rows)
+                                        {
+                                            <option value="@row["designationId"]">@row["designationName"]</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group"><label>Bank A/c No</label> <input id="search-bankNo" type="text" placeholder="" name="bankNo" class="form-control"></div>
+                                <div class="form-group"><label>Labour Card No</label>  <input id="search-labCardNo" type="text" placeholder="" name="labCardNo" class="form-control"></div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group"><label>Employee Name</label> <input id="search-employeeName" type="text" placeholder="" name="employeeName" class="form-control" required></div>
+                                <div class="form-group">
+                                    <label>Salary Type</label>
+                                    <select name="designation" class="form-control" id="search-salaryType">
+                                        <option value="All">All</option>
+                                        <option value="Daily wage">Daily wage</option>
+                                        <option value="Monthly">Monthly</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label>Passport No</label> <input id="search-passportNo" type="text" placeholder="" name="passportNo" class="form-control"></div>
+                                <div class="form-group"><label>Visa No</label>  <input id="search-visaNo" type="text" placeholder="" name="visaNo" class="form-control"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info offset-9" onClick="on_search_employees();">Search</button>
+                        <!--<button type="button" class="btn btn-info offset-1" onclick="on_clear_filters_salary_package();">Clear</button>-->
+                    </div>
+                </div>
+           </div>
+           <div class="ibox">
+               <div class="ibox-title">
+                   <div class="ibox-tools">
+                       <a class="collapse-link">
+                           <i class="fa fa-chevron-up"></i>
+                       </a>
+                       <a class="close-link">
+                           <i class="fa fa-times"></i>
+                       </a>
+                   </div>
+               </div>
+               <div class="ibox-content">
+                   <table id="employee-table" class="table table-striped table-bordered table-hover dataTables-employeeReg">
+                       <thead>
+                           <tr>
+                               <th>Sl No</th>
+                               <th>Employee Code</th>
+                               <th>Employee Name</th>
+                               <th>Designation</th>
+                           </tr>
+                       </thead>
+                       <tbody>
+                           <!-- content -->
+                       </tbody>
+                   </table>
+                   <div class="modal inmodal fade" id="edit_modal_employee" tabindex="-1" role="dialog" aria-hidden="true">
+                       <div class="modal-dialog modal-lg">
+                           <div class="modal-content modal-content-employee">
+                               <div class="modal-header">
+                                   <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                   <h4 class="modal-title">Employee Creation</h4>
+                                   <small class="font-bold">Employee</small>
+                               </div>
+                               <form >
+                                   <div class="modal-body" id="e-employee-id" value="0">
+                                       <div class="row">
+                                           <div class="col-6">
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Employee Code</label>
+                                                       <input id="e-employee-code" type="text" placeholder="Enter employee Code" name="employeeCode" class="col-6" required>
+                                                       <div class="col-2">
+                                                           <label class="employee-label-info">.</label>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Designation</label>
+                                                       <select name="designation" class="col-6" id="e-designation" required>
+                                                           @foreach (DataRow row in ((DataTable)ViewData["designations"]).Rows)
+                                                            {
+                                                                <option value="@row["designationId"]">@row["designationName"]</option>
+                                                            }
+                                                       </select>
+                                                       <div class="infont col-2">
+                                                           <a type="button" class="btn btn-info" href="@Url.Action("Designation")" target="_blank">+</a>
+                                                       </div>
+                                                   </div>
+                                                </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Marital Status</label>
+                                                       <select name="marital" class="col-6" id="e-marital-status">
+                                                           <option value="Single">Single</option>
+                                                           <option value="Married">Married</option>
+                                                       </select>
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Qualification</label>
+                                                       <input id="e-qualification" type="text" placeholder="" name="quali" class="col-6">
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Joining Date</label>
+                                                       <input id="e-joining-date" type="date" placeholder="" name="joining_date" class="col-6">
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Salary Type</label>
+                                                       <select name="salary_type" class="col-6" id="e-salary-type">
+                                                           <option value="Daily wage">Daily wage</option>
+                                                           <option value="Monthly">Monthly</option>
+                                                       </select>
+                                                       <div class="col-2">
+                                                           <label class="employee-label-info">.</label>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Address</label>
+                                                       <textarea id="e-address" name="address" rows="5" cols="5" class="col-6">
+                                                       </textarea>
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <div class="col-4"></div>
+                                                       <input id="e-active" type="checkbox" name="active" class="col-1">Active<br>
+                                                       <div class="col-7"></div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                           <div class="col-6">
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Employee Name</label>
+                                                       <input id="e-employee-name" type="text" placeholder="Enter employee Name" name="employeeName" class="col-6" required>
+                                                       <div class="col-2">
+                                                           <label class="employee-label-info">.</label>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Date of Birth</label>
+                                                       <input id="e-dob" type="date" placeholder="" name="date_birth" class="col-6">
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Gender</label>
+                                                       <select name="gender" class="col-6" id="e-gender">
+                                                           <option value="Male">Male</option>
+                                                           <option value="Female">Female</option>
+                                                       </select>
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Blood Group</label>
+                                                       <select name="blood_group" class="col-6" id="e-blood-type">
+                                                           <option value="A+">A+</option>
+                                                           <option value="A-">A-</option>
+                                                           <option value="B+">B+</option>
+                                                           <option value="B-">B-</option>
+                                                           <option value="AB+">AB+</option>
+                                                           <option value="AB+">AB+</option>
+                                                           <option value="O+">O+</option>
+                                                           <option value="O-">O-</option>
+                                                       </select>
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Termination</label>
+                                                       <input id="e-termination-date" type="date" placeholder="" name="termination_date" class="col-6">
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label id="e-label-salary" class="col-4">Salary Package</label>
+                                                       <select name="salary_package" class="col-6" id="e-salary-package" required>
+                                                           @foreach (DataRow row in ((DataTable)ViewData["salaryPackages"]).Rows)
+                                                            {
+                                                                <option value="@row["salaryPackageId"]">@row["salaryPackageName"]</option>
+                                                            }
+                                                       </select>
+                                                       <input id="e-daily-wage" type="number" class="col-6" style="display:none;"/>
+                                                       <div class="col-2">
+                                                          <a type="button" class="btn btn-info" href="@Url.Action("SalaryPackage")" target="_blank">+</a>   
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Phone No</label>
+                                                       <input id="e-phoneNo" type="text" placeholder="" name="phone_no" class="col-6">
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Mobile No</label>
+                                                       <input id="e-mobileNo" type="text" placeholder="" name="mobile_no" class="col-6">
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Email</label>
+                                                       <input id="e-email" type="email" placeholder="" name="email" class="col-6">
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Narration</label>
+                                                       <textarea id="e-narration" name="narration" rows="5" cols="5" class="col-6">
+                                                            </textarea>
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </div>
+                                       <div class="row">
+                                           <div class="col-6">
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Bank Name</label>
+                                                       <input id="e-bank-name" type="text" placeholder="" name="bank_name" class="col-6">
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Bank A/C No</label>
+                                                       <input id="e-bankNo" type="text" placeholder="" name="bank_no" class="col-6">
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Branch</label>
+                                                       <input id="e-branch-name" type="text" placeholder="" name="branch" class="col-6">
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">Branch Code</label>
+                                                       <input id="e-branch-code" type="text" placeholder="" name="branch_code" class="col-6">
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                           <div class="col-6">
+                                               <br />
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">PAN Number</label>
+                                                       <input id="e-panNo" type="text" placeholder="" name="pan_number" class="col-6">
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">PF Number</label>
+                                                       <input id="e-pfNo" type="text" placeholder="" name="pf_number" class="col-6">
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                               <div class="form-group">
+                                                   <div class="row">
+                                                       <label class="col-4">ESI Number</label>
+                                                       <input id="e-esiNo" type="text" placeholder="" name="esi_number" class="col-6">
+                                                       <div class="col-2"></div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </div>
+                                       <div class="row">
+                                           <div class="col-4">
+                                               <label>Passport Number</label>
+                                               <input id="e-passportNo" type="text" placeholder="" name="passport_number" class="form-control">
+                                           </div>
+                                           <div class="col-4">
+                                               <label>Labour Card No.</label>
+                                               <input id="e-labCardNo" type="text" placeholder="" name="labour_car" class="form-control">
+                                           </div>
+                                           <div class="col-4">
+                                               <label>Visa No.</label>
+                                               <input id="e-visaNo" type="text" placeholder="" name="labour_car" class="form-control">
+                                           </div>
+                                       </div>
+                                       <div class="row">
+                                           <div class="col-4">
+                                               <label>Expiry Date</label>
+                                               <input id="e-passport-expiry" type="date" placeholder="" name="date" class="form-control">
+                                           </div>
+                                           <div class="col-4">
+                                               <label>Expiry Date</label>
+                                               <input id="e-labCard-expiry" type="date" placeholder="" name="date" class="form-control">
+                                           </div>
+                                           <div class="col-4">
+                                               <label>Expiry Date</label>
+                                               <input id="e-visa-expiry" type="date" placeholder="" name="date" class="form-control">
+                                           </div>
+                                       </div>
+                                   </div>
+                                   <div class="modal-footer">
+                                       <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                                       <button type="button" class="btn btn-danger" style="display:none;">Delete</button>
+                                       <button type="button" class="btn btn-primary">Create</button>
+                                   </div>
+                               </form>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+                    
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link rel="stylesheet" href="~/lib/dataTables/datatables.min.css" />
+        <link rel="stylesheet" href="~/lib/sweetalert/dist/sweetalert.css" />
+    </environment>
+}
+
+@section Scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/lib/dataTables/datatables.min.js"></script>
+        <script src="~/lib/dataTables/dataTables.bootstrap4.min.js"></script>
+        <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
+        <script src="~/js/common.js"></script>
+    </environment>
+
+    <script type="text/javascript">
+        var oEmployeeTable;
+        $(document).ready(function () {
+            oEmployeeTable = $('#employee-table.dataTables-employeeReg').dataTable({
+                pageLength: 100,
+                dom: '<"html5buttons"B>lTfgitp',
+                buttons: [
+                    {
+                        text: 'Create Employee',
+                        action: function (e, dt, node, config) {
+                            editing_tr = null;
+                            show_edit_modal_employee(null);
+                        }
+                    }
+                ],
+                "columnDefs": [
+                    /*
+                     * full[0]-SL.NO
+                     * full[1]-employeeId
+                     * full[2]-employeeName
+                     * full[3]-employeeCode
+                     * full[4]-designationName
+                     */
+                    {
+                        targets: [0],
+                        render: function (o, v) {
+                            return o;
+                        },
+                    },
+                    {
+                        targets: [1],
+                        render: function (data, type, full) {
+                            var employeeCode = full[3];
+                            return employeeCode;
+                        },
+                    },
+                    {
+                        targets: [2],
+                        render: function (data, type, full) {
+                            var employeeName = full[2];
+                            return employeeName;
+                        },
+                    },
+                    {
+                        targets: [3],
+                        render: function (data, type, full) {
+                            var designationName = full[4]
+                            return designationName;
+                        },
+                    }
+                ],
+            });
+            
+            //Edit and Create Employee Dialog
+            $("#edit_modal_employee").on("click", ".btn-danger", function () {
+                on_click_delete_employee();
+            });
+
+            $("#edit_modal_employee").on("click", ".btn-primary", function () {
+                on_click_save_employee();
+            });
+
+            $("#e-designation").on("focus", function () {
+                on_focus_edit_modal_designation($(this));
+            });
+            
+            $("#e-salary-type").on("change", function () {
+                changed_salary_type($(this).val());
+            });
+
+            $("#e-salary-package").on("focus", function () {
+                on_focus_edit_modal_salary_package($(this));
+            });
+            
+            on_search_employees();
+        });
+
+        function on_search_employees() {
+            var form = $('#__AjaxAntiForgeryForm');
+            var token = $('input[name="__RequestVerificationToken"]', form).val();
+            var employee_code = $("#search-employeeCode").val();
+            var employee_name = $("#search-employeeName").val();
+            var designationId = parseInt($("#search-designation").val());
+            var salaryType = $("#search-salaryType").val();
+            var bankNo = $("#search-bankNo").val();
+            var passportNo = $("#search-passportNo").val();
+            var labCardNo = $("#search-labCardNo").val();
+            var visaNo = $("#search-visaNo").val();
+
+            var data = {
+                __RequestVerificationToken: token,
+                code: employee_code,
+                name: employee_name,
+                designationId: designationId,
+                salaryType: salaryType,
+                bankNo: bankNo,
+                passportNo: passportNo,
+                labCardNo: labCardNo,
+                visaNo: visaNo
+            };
+
+            $.post("@Url.Action("SearchEmployee")", data, function (response) {
+                if (response.isSuccess == true) {
+                    refresh_employee_table(response.data);
+                }
+                else {
+                    swal("Failed!", response.message, "warning");
+                }
+            });
+        }
+
+        var editing_tr;
+        function refresh_employee_table(data) {
+            oEmployeeTable.fnClearTable(false);
+            var table_data = JSON.parse(data);
+            for (var i = 0; i < table_data.length; i++) {
+                var row_arry = ConvertObjectToArray(table_data[i]);
+                oEmployeeTable.fnAddData(row_arry);
+            }
+
+            trigger_row_click_employee_table();
+        }
+
+        function trigger_row_click_employee_table() {
+            $("#employee-table tr").on("click", function () {
+                on_click_row_employee_table($(this));
+            });
+        }
+
+        function on_click_row_employee_table(element) {
+            var row_data = oEmployeeTable.fnGetData(element);
+            if (row_data == null)
+                return;
+            editing_tr = element;
+            var id = row_data[1];
+            var form = $('#__AjaxAntiForgeryForm');
+            var token = $('input[name="__RequestVerificationToken"]', form).val();
+            var data = {
+                __RequestVerificationToken: token,
+                employeeId: id
+            };
+            $.post("@Url.Action("GetEmployee")", data, function (response) {
+                if (response.isSuccess == true) {
+                    console.log(response);
+                    show_edit_modal_employee(response.data);
+                }
+                else {
+                    swal("Failed!", response.message, "warning");
+                }
+            });
+        }
+
+        function on_focus_edit_modal_designation(element) {
+            $.get("@Url.Action("GetDesignation")", function (response) {
+                console.log(response);
+                if (response.isSuccess == true) {
+                    data = JSON.parse(response.data);
+                    var selected_val = element.val();
+                    element.find("option").remove();
+                    var string = "";
+                    for (var i = 0; i < data.length; i++) {
+                        string = string + "<option value='" + data[i].designationId + "'>" + data[i].designationName + "</option>";
+                    }
+                    element.append(string);
+                    element.val(selected_val);
+                   // element.refresh();
+                }
+            });
+        }
+
+        function on_focus_edit_modal_salary_package(element) {
+            $.get("@Url.Action("SalaryPackageViewAllForActive")", function (response) {
+                console.log(response);
+                if (response.isSuccess == true) {
+                    data = JSON.parse(response.data);
+                    var selected_val = element.val();
+                    element.find("option").remove();
+                    var string = "";
+                    for (var i = 0; i < data.length; i++) {
+                        string = string + "<option value='" + data[i].salaryPackageId + "'>" + data[i].salaryPackageName + "</option>";
+                    }
+                    element.append(string);
+                    element.val(selected_val);
+                }
+            });
+        }
+
+        function changed_salary_type(salary_type) {
+            console.log(salary_type);
+            if (salary_type == "Daily wage") {
+                $("#e-label-salary").text("Daily Wage");
+                $("#e-salary-package").css("display", "none");
+                $("#e-new-salary-package").css("display", "none");
+                $("#e-daily-wage").css("display", "block");
+        
+            }
+            else {
+                $("#e-label-salary").text("Salary Package");
+                $("#e-salary-package").css("display", "block");
+                $("#e-new-salary-package").css("display", "block");
+                $("#e-daily-wage").css("display", "none");
+            }
+        }
+
+        function show_edit_modal_employee(data) {
+            refresh_edit_modal_employee();
+            if (data) { //edit mode
+                var employee_data = data;
+                $("#e-employee-id").attr("value", employee_data.employeeId);
+                $("#e-employee-code").val(employee_data.employeeCode);
+                $("#e-employee-name").val(employee_data.employeeName);
+                $("#e-designation").val(employee_data.designationId);
+                $("#e-dob").val(get_date_in_special_format(employee_data.dob));
+                $("#e-marital-status").val(employee_data.maritalStatus);
+                $("#e-gender").val(employee_data.gender);
+                $("#e-qualification").val(employee_data.qualification);
+                $("#e-blood-type").val(employee_data.bloodGroup);
+                $("#e-joining-date").val(get_date_in_special_format(employee_data.joiningDate));
+                $("#e-termination-date").val(get_date_in_special_format(employee_data.terminationDate));
+                $("#e-salary-type").val(employee_data.salaryType);
+                changed_salary_type(employee_data.salaryType);
+                if (employee_data.salaryType == "Daily wage") {
+                    $("#e-daily-wage").val(employee_data.dailyWage);
+                }
+                else {
+                    $("#e-salary-package").val(employee_data.defaultPackageId);
+                }
+                $("#e-address").val(employee_data.address);
+                $("#e-phoneNo").val(employee_data.phoneNumber);
+                $("#e-mobileNo").val(employee_data.mobileNumber);
+                $("#e-email").val(employee_data.email);
+                $("#e-active").prop("checked", employee_data.isActive);
+                $("#e-narration").val(employee_data.narration);
+                $("#e-bank-name").val(employee_data.bankName);
+                $("#e-bankNo").val(employee_data.bankNumber);
+                $("#e-branch-name").val(employee_data.branchName);
+                $("#e-branch-code").val(employee_data.branchCode);
+                $("#e-panNo").val(employee_data.panNumber);
+                $("#e-pfNo").val(employee_data.pfNumber);
+                $("#e-esiNo").val(employee_data.esiNumber);
+                $("#e-passportNo").val(employee_data.passportNo);
+                $("#e-passport-expiry").val(get_date_in_special_format(employee_data.passportExpiryDate));
+                $("#e-labCardNo").val(employee_data.labourCardNumber);
+                $("#e-labCard-expiry").val(get_date_in_special_format(employee_data.labourCardExpiryDate));
+                $("#e-visaNo").val(employee_data.visaNumber);
+                $("#e-visa-expiry").val(get_date_in_special_format(employee_data.visaExpiryDate));
+
+                $("#edit_modal_employee .btn-danger").css("display", "block");
+                $("#edit_modal_employee .btn-primary").text("Update");
+            }
+            $("#edit_modal_employee").modal("show");
+        }
+
+        function refresh_edit_modal_employee() {
+            var now = get_date_in_special_format(new Date());
+            $("#e-employee-id").attr("value", 0);
+            $("#e-employee-code").val("");
+            $("#e-employee-name").val("");
+            $("#e-designation").val(-1);
+            $("#e-dob").val(now);
+            $("#e-marital-status").val(0);
+            $("#e-gender").val(0);
+            $("#e-qualification").val(0);
+            $("#e-blood-type").val("");
+            $("#e-joining-date").val(now);
+            $("#e-termination-date").val(now);
+            $("#e-salayType").val(0);
+            $("#e-salary-package").val(0);
+            changed_salary_type($("#e-salary-type").val());
+            $("#e-daily-wage").val(0);
+            $("#e-address").val("");
+            $("#e-phoneNo").val("");
+            $("#e-mobileNo").val("");
+            $("#e-email").val("");
+            $("#e-active").prop("checked", false);
+            $("#e-narration").val("");
+            $("#e-bank-name").val("");
+            $("#e-bankNo").val("");
+            $("#e-branch-name").val("");
+            $("#e-branch-code").val("");
+            $("#e-panNo").val("");
+            $("#e-pfNo").val("");
+            $("#e-esiNo").val("");
+            $("#e-passportNo").val("");
+            $("#e-passport-expiry").val(now);
+            $("#e-labCardNo").val("");
+            $("#e-labCard-expiry").val(now);
+            $("#e-visaNo").val("");
+            $("#e-visa-expiry").val(now);
+            
+            $("#edit_modal_employee .btn-danger").css("display", "none");
+            $("#edit_modal_employee .btn-primary").text("Create");
+        }
+
+        function on_click_delete_employee() {
+            var employeeId = $("#e-employee-id").attr("value");;
+
+            swal({
+                title: "Are you sure?",
+                text: "You will not be able to recover this employee!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, delete it!",
+                closeOnConfirm: false
+            }, function () {
+                var form = $('#__AjaxAntiForgeryForm');
+                var token = $('input[name="__RequestVerificationToken"]', form).val();
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("DeleteEmployee")",
+                    data: {
+                        __RequestVerificationToken: token,
+                        employeeId: employeeId
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.isSuccess == true) {
+                            oEmployeeTable.fnDeleteRow(editing_tr);
+                            swal("Deleted!", "This Employee has just been deleted successfully!", "success");
+                            $('#edit_modal_employee').modal('hide');
+                        }
+                        else {
+                            swal("Failed", response.message, "warning");
+                        }
+                    },
+                    error: function (req, status, error) {
+                        swal("Failed", "Connection Error", "warning");
+                    }
+                });
+
+            });
+        }
+
+        function on_click_save_employee() {
+            var employeeId = $("#e-employee-id").attr("value");
+            var employeeCode = $("#e-employee-code").val();
+            var employeeName = $("#e-employee-name").val();
+            var salaryType = $("#e-salary-type").val();
+            var salaryPackage = $("#e-salary-package").val();
+            var dailyWage = $("#e-daily-wage").val();
+            var designationId = $("#e-designation").val();
+            var dob = $("#e-dob").val();
+            var maritalStatus = $("#e-marital-status").val();
+            var gender = $("#e-gender").val();
+            var qualification = $("#e-qualification").val();
+            var bloodType = $("#e-blood-type").val();
+            var joiningDate = $("#e-joining-date").val();
+            var terminationDate = $("#e-termination-date").val();
+            var address = $("#e-address").val();
+            var phoneNumber = $("#e-phoneNo").val();
+            var mobileNumber = $("#e-mobileNo").val();
+            var email = $("#e-email").val();
+            var isActive = $("#e-active").prop("checked");
+            console.log(isActive);
+            var narration = $("#e-narration").val();
+            var bankName = $("#e-bank-name").val();
+            var bankNumber = $("#e-bankNo").val();
+            var branchName =$("#e-branch-name").val();
+            var branchCode = $("#e-branch-code").val();
+            var panNumber = $("#e-panNo").val();
+            var pfNumber = $("#e-pfNo").val();
+            var esiNumber = $("#e-esiNo").val();
+            var passportNo = $("#e-passportNo").val();
+            var passportExpiryDate = $("#e-passport-expiry").val();
+            var labourCardNumber = $("#e-labCardNo").val();
+            var labourCardExpiryDate = $("#e-labCard-expiry").val();
+            var visaNumber = $("#e-visaNo").val();
+            var visaExpiryDate = $("#e-visa-expiry").val();
+            var form = $('#__AjaxAntiForgeryForm');
+            var token = $('input[name="__RequestVerificationToken"]', form).val();
+
+            //check required fields
+            if (employeeCode == "" || employeeCode == null || !employeeCode) {
+                swal("Employee Code is required!", "", "info");
+                return;
+            }
+            if (employeeName == "" || employeeName == null || !employeeName) {
+                swal("Employee Name is required!", "", "info");
+                return;
+            }
+            if (salaryType <= 0) {
+                swal("Please select Salary Type!", "", "info");
+                return;
+            }
+            if (salaryType == "Daily wage" && (dailyWage == "" || dailyWage == null || !dailyWage || parseFloat(dailyWage) <= 0)) {
+                swal("Daily Wage is required!", "", "info");
+                return;
+            }
+            if (salaryType == "Monthly" && salaryPackage <= 0) {
+                swal("Please select Salary Package.", "", "info");
+                return;
+            }
+            if (designationId == null || designationId == -1 ) {
+                swal("Please select Designation Id.", "", "info");
+                return;
+            }
+
+            var _joiningDate = new Date(joiningDate);
+            var _terminationDate = new Date(terminationDate);
+            if ( _terminationDate < _joiningDate ) {
+                swal("Joining date should not be greater than termination date!", "", "info");
+                return;
+            }
+           
+            if (!validate_email_format(email)) {
+                swal("Email is not correct format!", "", "info");
+                return;
+            }
+            var employeeData = {
+                employeeId: employeeId,
+                employeeCode: employeeCode,
+                employeeName: employeeName,
+                salaryType: salaryType,
+                salaryPackage: salaryPackage,
+                dailyWage: dailyWage,
+                designationId: designationId,
+                dob : dob,
+                maritalStatus: maritalStatus,
+                gender: gender,
+                qualification: qualification,
+                bloodGroup: bloodType,
+                joiningDate: joiningDate,
+                terminationDate: terminationDate,
+                address: address,
+                phoneNumber: phoneNumber,
+                mobileNumber: mobileNumber,
+                email: email,
+                isActive: isActive,
+                narration: narration,
+                bankName: bankName,
+                bankNumber: bankNumber,
+                branchName: branchName,
+                branchCode: branchCode,
+                panNumber: panNumber,
+                pfNumber: pfNumber,
+                esiNumber: esiNumber,
+                passportNo: passportNo,
+                passportExpiryDate: passportExpiryDate,
+                labourCardNumber: labourCardNumber,
+                labourCardExpiryDate: labourCardExpiryDate,
+                visaNumber: visaNumber,
+                visaExpiryDate: visaExpiryDate
+            };
+            console.log(employeeData);
+            var strEmployee = JSON.stringify(employeeData);
+            $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("SaveEmployee")",
+                    data: {
+                        __RequestVerificationToken: token,
+                        employeeId: employeeId,
+                        strEmployee: strEmployee
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.isSuccess == true) {
+                            if (editing_tr) {
+                                var row_data = oEmployeeTable.fnGetData(editing_tr);
+                                row_data[3] = response.data.employeeCode;
+                                row_data[2] = response.data.employeeName;
+                                row_data[4] = $("#e-designation").find("option:selected").text();
+                                oEmployeeTable.fnUpdate(row_data, editing_tr);
+                            }
+                            else {
+                                var row_data = [];
+                                var slNo = oEmployeeTable.fnGetData().length + 1;
+                                row_data.push(slNo);
+                                row_data.push(response.data.employeeId);
+                                row_data.push(response.data.employeeName);
+                                row_data.push(response.data.employeeCode);
+                                row_data.push($("#e-designation").find("option:selected").text());
+                                oEmployeeTable.fnAddData(row_data);
+                                on_search_employees();
+                                trigger_row_click_employee_table();
+                            }
+                            swal("Saved!", "This employee has been saved successfully!", "success");
+                            $("#edit_modal_employee").modal("hide");
+                        }
+                        else {
+                            swal("Failed", response.message, "warning");
+                        }
+                    },
+                    error: function (req, status, error) {
+                        swal("Failed", "API Connection Error", "warning");
+                    }
+                });
+        }
+    </script>
+}

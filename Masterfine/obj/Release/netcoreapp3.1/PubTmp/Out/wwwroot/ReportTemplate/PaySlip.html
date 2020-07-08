@@ -1,0 +1,248 @@
+﻿<!--<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Pay Slip</title>
+    
+    
+</head>
+
+<body>-->
+    <div id="DivPrint">
+        <div id="" class="invoice-box" style="max-width:100%; min-height:1050px; margin:auto; padding:0px 20px 0; font-family:Arial; overflow:hidden; ">
+            <style>
+
+                .invoice-box {
+                    min-width: 800px;
+                    margin: auto;
+                    padding: 30px;
+                    border: 1px solid #eee;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, .15);
+                    font-size: 16px;
+                    line-height: 24px;
+                    font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+                    color: #555;
+                }
+
+                    .invoice-box table {
+                        width: 100%;
+                        line-height: inherit;
+                        text-align: left;
+                    }
+
+                        .invoice-box table td {
+                            padding: 5px;
+                            vertical-align: top;
+                        }
+
+                        .invoice-box table tr td:nth-child(2) {
+                            /*text-align: right;*/
+                        }
+
+                        .invoice-box table tr.top table td {
+                            padding-bottom: 20px;
+                        }
+
+                            .invoice-box table tr.top table td.title {
+                                font-size: 45px;
+                                line-height: 45px;
+                                color: #333;
+                            }
+
+                        .invoice-box table tr.information table td {
+                            padding-bottom: 15px;
+                        }
+
+                        .invoice-box table tr.heading {
+                            background: #000 !important;
+                            color: white !important;
+                            border-bottom: 1px solid #ddd;
+                            font-weight: bold;
+                            -webkit-print-color-adjust: exact;
+                        }
+
+                        .invoice-box table tr.details td {
+                            padding-bottom: 15px;
+                        }
+
+                        .invoice-box table tr.item td {
+                            border-bottom: 1px solid black;
+                        }
+
+                        .invoice-box table tr.subItem td {
+                            border-top: 1px solid black;
+                        }
+
+                        .invoice-box table tr.item.last td {
+                            border-bottom: none;
+                        }
+
+                        .invoice-box table tr.total td:nth-child(2) {
+                            border-top: 2px solid #eee;
+                            font-weight: bold;
+                        }
+
+                @media only screen and (max-width: 600px) {
+                    .invoice-box table tr.top table td {
+                        width: 100%;
+                        display: block;
+                        text-align: center;
+                    }
+
+                    .invoice-box table tr.information table td {
+                        width: 100%;
+                        display: block;
+                        text-align: center;
+                    }
+                }
+
+                /** RTL **/
+                .rtl {
+                    direction: rtl;
+                    font-family: Tahoma, 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+                }
+
+                    .rtl table {
+                        text-align: right;
+                    }
+
+                        .rtl table tr td:nth-child(2) {
+                            text-align: left;
+                        }
+
+                .mainHeading {
+                    font-size: large;
+                    font-weight: bold;
+                }
+            </style>
+            <table cellpadding="0" cellspacing="0" style="width:100%;">
+                <tr class="top">
+                    <td colspan="4">
+                        <table cellpadding="0" cellspacing="0" style="width:100%;">
+                            <tr>
+                                <td class="">
+                                    <img src="{!#Logo#!}" alt="Logo" height="50" width="50" /> <!----> <label class="mainHeading">{!#CompanyName#!}</label><!----> <br />
+                                    {!#mailingname#!}<!----> <br />
+                                    {!#address#!}<!----> <br />
+                                    {!#county#!}<!----> <br />
+                                    {!#state#!}<!----> <br />
+                                    {!#pin#!}<!---->
+                                </td>
+
+                                <td>
+                                    {!#currentDate#!}<br /><br /><br />
+                                    {!#Email#!}<br />
+                                    {!#Phone#!}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr class="information">
+                    <td colspan="4">
+                        <table cellpadding="0" cellspacing="0" style="width:100%;">
+                            <tr>
+                                <td colspan="4" style="text-align:center;">
+                                    <u class="mainHeading">Pay Slip</u>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Employee Code</td>
+                                <td>{!#emCode#!}</td>
+
+                                <td>Salary Month</td>
+                                <td>{!#salMonth#!}</td>
+                            </tr>
+                            <tr>
+                                <td>Employee Name</td>
+                                <td>{!#empName#!}</td>
+
+                                <td>Salary Date</td>
+                                <td>{!#salDate#!}</td>
+                            </tr>
+                            <tr>
+                                <td>Designation</td>
+                                <td colspan="3">{!#designation#!}</td>
+                            </tr>
+
+                            <tr class="subItem">
+                                <td>Working Days</td>
+                                <td>{!#workingDays#!}</td>
+                                <td>Present Days</td>
+                                <td>{!#presentDays#!}</td>
+                            </tr>
+                            <tr class="item">
+                                <td>Leave Days</td>
+                                <td colspan="3">{!#leaveDays#!}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr class="heading">
+                    <td>Earning</td>
+                    <td style="text-align:right;">Amount</td>
+                    <td>Deduction</td>
+                    <td style="text-align:right;">Amount</td>
+                </tr>
+                {!#tabledetail#!}
+                <!--<tr class="item">
+        <td>{!#AddpayheadName#!}</td>
+        <td style="text-align:right;">{!#ADDamount#!}</td>
+        <td>{!#DEDpayheadName#!}</td>
+        <td style="text-align:right;">{!#dedAmount#!}</td>
+    </tr>-->
+                <tr class="subItem">
+                    <td>Bonus</td>
+                    <td style="text-align:right;">{!#bonusAmount#!}</td>
+                    <td>Deduction</td>
+                    <td style="text-align:right;">{!#deductionAmount#!}</td>
+                </tr>
+                <tr>
+                    <td colspan="2"></td>
+                    <td>Advance</td>
+                    <td colspan="2" style="text-align:right;">{!#advance#!}</td>
+
+                </tr>
+                <tr class="item">
+                    <td colspan="2"></td>
+                    <td>LOP</td>
+                    <td colspan="2" style="text-align:right;">{!#lop#!}</td>
+                </tr>
+                <tr class="item">
+                    <td><b>Total Earnings</b></td>
+                    <td style="text-align:right;">{!#totalEarning#!}</td>
+                    <td><b>Total Deductions</b></td>
+                    <td style="text-align:right;">{!#totalDeductions#!}</td>
+                </tr>
+                <tr class="item">
+                    <td colspan="4">Net Pay</td>
+                </tr>
+                <tr class="item">
+                    <td colspan="4">{!#netPay#!}</td>
+                </tr>
+                <!--<tr class="details">
+        <td>
+            Check
+        </td>
+
+        <td>
+            1000
+        </td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr class="total">
+        <td></td>
+
+        <td colspan="3">
+            Total: $385.00
+        </td>
+    </tr>-->
+            </table>
+        </div>
+    </div>
+<!--</body>
+</html>-->

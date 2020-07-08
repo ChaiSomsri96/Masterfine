@@ -1,0 +1,452 @@
+﻿@using System.Data
+@{
+    ViewData["Title"] = "HolidaySettings";
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Holiday Settings</h2>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Main", "Home")">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a>Payroll</a>
+            </li>
+            <li class="active breadcrumb-item">
+                <strong>Holiday Settings</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="form-group col-4" id="calendar">
+                                <div class="col-10" data-role="calendar" 
+                                     data-bind="value: selectedDate,
+                                events: { change: onChange, navigate:onNavigate }"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content" >
+
+                    <table class="table table-striped table-bordered table-hover dataTables-holiday" id="holidayTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Narration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (DataRow row in Model.Rows)
+                            {
+                                <tr value='@row["date"]' class="row_data" style="cursor:pointer">
+                                    <td name="td_date">@row["date"]</td>
+                                    <td name="td_narration">@row["narration"]</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div class="form-group container-fluid">
+                        <div class="form-inline justify-content-end modal-footer">
+                            <!--<button type="button" class="btn btn-primary" id="btn_save">Save</button>-->
+                            <button type="button" class="btn btn-primary" id="btn_clear">Clear</button>
+                        </div>
+                    </div>
+                    <div class="modal inmodal fade" id="mHolidayEdit" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                    <h4 class="modal-title">Holiday Add or Edit</h4>
+                                    <small class="font-bold">Add or Edit Holiday</small>
+                                </div>
+                                <!--<form method="POST" action="EditViewHoliday">-->
+                                <div class="modal-body">
+                                    <div class="form-group"><label>Date</label> <label class="form-control" name="e_date" id="e_date" ></label></div>
+                                    <div class="form-group"><label>Narration</label> <textarea class="form-control" name="e_narration" id="e_narration" rows="3"></textarea></div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-white close_btn" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-danger delete_btn">Delete</button>
+                                    <button type="submit" class="btn btn-primary edit_btn">Edit</button>
+                                </div>
+                                <!--</form>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link href="~/lib/calendar/kendo.common.min.css" rel="stylesheet">
+        <link href="~/lib/calendar/kendo.default.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="~/lib/dataTables/datatables.min.css" />
+        <link rel="stylesheet" href="~/lib/sweetalert/dist/sweetalert.css" />
+        <script src="~/js/common.js"></script>
+    </environment>
+}
+
+@section Scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/lib/calendar/kendo.all.min.js"></script>
+        <script src="~/lib/dataTables/datatables.min.js"></script>
+        <script src="~/lib/dataTables/dataTables.bootstrap4.min.js"></script>
+        <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
+
+    </environment>
+
+    <script type="text/javascript">
+        var oTable;
+        var tr = null;
+        var current_month = "";
+        var cur_dateD;
+        $(document).ready(function () {
+            oTable = $('.dataTables-holiday').dataTable({
+                pageLength: 100,
+                "columnDefs": [
+                    {
+                        targets: [0],
+                        render: function (o, v) {
+                            return o;
+                        },
+                    },
+                    {
+                        targets: [1],
+                        render: function (o, v) {
+                            return o;
+                        },
+                    },
+                ]
+            });
+            var calendar = $("#calendar").data("kendoCalendar");
+            trigger_holiday_table_row_click();
+            var viewModel = kendo.observable({
+                selectedDate: null,
+                onChange: function () {
+
+                    var cur_date = kendo.toString(this.get("selectedDate"), "d");
+                    
+                    
+                    var cur_dateYear = this.get("selectedDate").getFullYear();
+                    var cur_dateMonth = this.get("selectedDate").getMonth();
+                    var cur_dateDay = this.get("selectedDate").getDate();
+                    var dtClicked = new Date("25 Mar 2020");
+                    dtClicked.setFullYear(cur_dateYear);
+                    dtClicked.setMonth(cur_dateMonth);
+                    dtClicked.setDate(cur_dateDay);
+                    
+                    var dateStr = dtClicked.toString().substr(4, 11);
+                    cur_dateD = dateStr.substr(4, 2) + "-" + dateStr.substr(0, 3) + "-" + dateStr.substr(7, 4);
+                    var cur_Month = cur_dateYear.toString() + cur_dateMonth.toString();
+                    if (current_month != cur_Month) {
+                        refresh_table_data(cur_dateD, true);
+                    }
+                    else
+                        on_add_selected_date(cur_dateD);
+                    current_month = cur_Month;
+                    
+                },
+                onNavigate: function () {
+                    var cur_date = $("#calendar .k-header .k-nav-fast").text();
+                    cur_dateD = cur_date;
+                    refresh_table_data(cur_date, false);
+                }
+            });
+            kendo.bind($("#calendar"), viewModel);
+             
+            $("#btn_save").on("click", null, function () {
+                var rows = $('.dataTables-holiday tr');
+                
+                var aData = oTable.fnGetData(0);
+                
+                
+                var dataArray = new Array();
+
+                $(".dataTables-holiday tbody tr").each(function () {
+                    var data = oTable.fnGetData(this);
+                    if  (data != null)
+                            dataArray.push({
+                                date: data[0], narration: data[1] == "" ?data[1]: data[1].toString()
+                            });
+                });
+                var jsonData = JSON.stringify(dataArray);
+                swal({
+                    title: "Are you sure?",
+                    text: "You will be able to save these holiday settings!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, save it!",
+                    closeOnConfirm: false
+                }, function () {
+                    var form = $('#__AjaxAntiForgeryForm');
+                    var token = $('input[name="__RequestVerificationToken"]', form).val();
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("SaveHoliday")",
+                        data: {
+                            __RequestVerificationToken: token,
+                            cur_month: cur_dateD,
+                            tableData: jsonData
+                        },
+                        dataType: "json",
+                        success: function (msg) {
+
+                            if (msg.error == "success") {
+                                swal("Saved!", "Selected Holiday Setting has been saved.", "success");
+                            }
+                            else if (msg.error == "error") {
+                                swal("Failed", "You can't save, reference exist.", "warning");
+                            }
+                            else if (msg.error == "failed") {
+                                swal("Failed", "Database Connection Error", "warning");
+                            }
+                        },
+                        error: function (req, status, error) {
+                            swal("Failed", "API Server Connection Error", "warning");
+                        }
+                    });
+
+                });
+            });
+            $("#btn_clear").on("click", null, function () {
+                //var today = new Date();
+                //viewModel.set("selectedDate", today);
+                swal({
+                    title: "Are you sure?",
+                    text: "You will be able to delete these holiday settings!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, clear it!",
+                    closeOnConfirm: false
+                }, function () {
+                    var form = $('#__AjaxAntiForgeryForm');
+                    var token = $('input[name="__RequestVerificationToken"]', form).val();
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("ClearHoliday")",
+                        data: {
+                            __RequestVerificationToken: token,
+                            cur_month: cur_dateD,
+                        },
+                        dataType: "json",
+                        success: function (msg) {
+
+                            if (msg.error == "success") {
+                                var rows = $('.dataTables-holiday tr');
+                                oTable.fnDeleteRow(rows);
+                                oTable.fnClearTable(true);
+                                swal("Clear!", "Selected Holiday Setting has been deleted.", "success");
+                            }
+                            else if (msg.error == "error") {
+                                swal("Failed", "You can't save, reference exist.", "warning");
+                            }
+                            else if (msg.error == "failed") {
+                                swal("Failed", "Database Connection Error", "warning");
+                            }
+                        },
+                        error: function (req, status, error) {
+                            swal("Failed", "API Server Connection Error", "warning");
+                        }
+                    });
+
+                });
+            });
+            $("#mHolidayEdit").on("click", ".delete_btn", function () {
+                if (tr == null) return;
+                var form = $('#__AjaxAntiForgeryForm');
+                var token = $('input[name="__RequestVerificationToken"]', form).val();
+                var date = $('#mHolidayEdit #e_date').text();
+                $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("DeleteHoliday")",
+                        data: {
+                            __RequestVerificationToken: token,                            
+                            date: date
+                        },
+                        dataType: "json",
+                        success: function (msg) {
+                            oTable.fnDeleteRow(tr);
+                            tr = null;
+                            $('#mHolidayEdit').modal('hide');
+                            swal("Deleted in DB!", "Selected Holiday Setting has been deleted in the current DB", "success");
+                        },
+                        error: function (req, status, error) {
+                            swal("Failed", "API Server Connection Error", "warning");
+                        }
+                    });
+            });
+            $("#mHolidayEdit").on("click", ".edit_btn", function () {
+                var form = $('#__AjaxAntiForgeryForm');
+                var token = $('input[name="__RequestVerificationToken"]', form).val();
+                var date = $('#mHolidayEdit #e_date').text();
+                var narration = $('#mHolidayEdit #e_narration').val();
+                if ($(this).text() == "Edit") {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("EditHoliday")",
+                        data: {
+                            __RequestVerificationToken: token,                            
+                            date: date,
+                            narration: narration
+                        },
+                        dataType: "json",
+                        success: function (msg) {
+                            oTable.fnUpdate([narration], trPos, 1, true, false);
+                        },
+                        error: function (req, status, error) {
+                            swal("Failed", "API Server Connection Error", "warning");
+                        }
+                    });
+                    
+                }
+                else if ($(this).text() == "Add") {
+                    
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("AddHoliday")",
+                        data: {
+                            __RequestVerificationToken: token,
+                            date: date,
+                            narration: narration
+                        },
+                        dataType: "json",
+                        success: function (msg) {
+                            var array = [];
+                            array.push(date);
+                            array.push(narration.toString());
+                            oTable.fnAddData(array);
+                            trigger_holiday_table_row_click();
+                        },
+                        error: function (req, status, error) {
+                            swal("Failed", "API Server Connection Error", "warning");
+                        }
+                    });
+                }
+                $('#mHolidayEdit').modal('hide');
+            });
+           
+        });
+        var trPos = 0;
+        
+        function trigger_holiday_table_row_click() {
+            $(".dataTables-holiday tbody tr").on("click", null, function () {
+                trPos = oTable.fnGetPosition(this);
+                if (trPos == undefined)
+                    return;
+                var aData = oTable.fnGetData( trPos );
+                tr = this;
+                var date = aData[0];
+                var narration = aData[1];
+                $("#e_date").text(date);
+                $("#e_narration").val(narration);
+                $('#mHolidayEdit .edit_btn').text("Edit");
+                $('#mHolidayEdit .delete_btn').attr("disabled", false);
+                $('#mHolidayEdit').modal('show');
+            });
+        }
+        function refresh_table_data(cur_date, bAdd) {
+            var token = $('input[name="__RequestVerificationToken"]', $('#__AjaxAntiForgeryForm')).val();
+            $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetHolidayData")",
+                    data: {
+                        __RequestVerificationToken: token,
+                        date: cur_date
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        refresh_table(response["data"]);
+                        if (bAdd)
+                            on_add_selected_date(cur_date);
+                    },
+                    error: function (req, status, error) {
+                        swal("Failed", "API Server Connection Error", "warning");
+                    }
+             });
+
+        }
+        function refresh_table(data) {
+            if (data == null || data == "")
+                return;
+            oTable.fnClearTable(true);
+            var tbObj = JSON.parse(data);
+            for (var i = 0; i < tbObj.length; i++) {
+                var tbArray = ConvertObjectToArray(tbObj[i]);
+                oTable.fnAddData(tbArray);
+            }
+            trigger_holiday_table_row_click();
+        }
+        function on_add_selected_date(cur_date) {
+            var repeated = false;
+            var dataArray = [];
+            $(".dataTables-holiday tbody tr").each(function () {
+                var data = oTable.fnGetData(this);
+                if (data != null)
+                    dataArray.push({
+                        date: data[0], narration: data[1] == "" ? data[1] : data[1].toString()
+                    });
+            });
+            if (dataArray == null) return;
+            for (var i = 0; i < dataArray.length; i++) {
+                var date = dataArray[i].date;
+                if (date == cur_date)
+                    repeated = true;
+            }
+
+            if (repeated == false) {
+                $('#mHolidayEdit .edit_btn').text("Add");
+                $('#mHolidayEdit #e_date').text(cur_date);
+                $('#mHolidayEdit #e_narration').val("");
+                $('#mHolidayEdit .delete_btn').attr("disabled", true);
+                $('#mHolidayEdit').modal('show');
+            } else {
+                swal("Repeated", "Cannot make the repeated holiday setting!", "warning");
+            }
+        }
+    </script>
+}
